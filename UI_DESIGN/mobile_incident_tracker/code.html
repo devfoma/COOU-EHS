@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Campus Safe | Incident Tracker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#d4e4fa",
+                    "on-primary-fixed": "#131b2e",
+                    "error": "#ffb4ab",
+                    "primary-fixed": "#dae2fd",
+                    "on-primary-container": "#798098",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-error-container": "#ffdad6",
+                    "surface-dim": "#051424",
+                    "on-primary": "#283044",
+                    "on-background": "#d4e4fa",
+                    "on-secondary": "#003915",
+                    "surface-container-high": "#1c2b3c",
+                    "inverse-on-surface": "#233143",
+                    "tertiary-container": "#251400",
+                    "surface-container-lowest": "#010f1f",
+                    "outline-variant": "#45464d",
+                    "primary": "#bec6e0",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-secondary-container": "#004119",
+                    "outline": "#909097",
+                    "inverse-primary": "#565e74",
+                    "surface": "#051424",
+                    "primary-container": "#0f172a",
+                    "surface-tint": "#bec6e0",
+                    "tertiary": "#ffb95f",
+                    "inverse-surface": "#d4e4fa",
+                    "on-error": "#690005",
+                    "tertiary-fixed": "#ffddb8",
+                    "background": "#051424",
+                    "surface-variant": "#273647",
+                    "on-surface-variant": "#c6c6cd",
+                    "on-tertiary-fixed": "#2a1700",
+                    "secondary-fixed": "#6bff8f",
+                    "on-secondary-fixed-variant": "#005321",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-container-highest": "#273647",
+                    "surface-container": "#122131",
+                    "on-tertiary": "#472a00",
+                    "surface-container-low": "#0d1c2d",
+                    "surface-bright": "#2c3a4c",
+                    "secondary-container": "#00b954",
+                    "secondary": "#4ae176",
+                    "on-tertiary-container": "#b47300",
+                    "on-secondary-fixed": "#002109",
+                    "secondary-fixed-dim": "#4ae176"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "sidebar-width-expanded": "240px",
+                    "sidebar-width-condensed": "72px",
+                    "gutter": "16px",
+                    "container-padding": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "data-mono": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Outfit"],
+                    "display-lg": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .status-glow-active {
+            box-shadow: 0 0 12px rgba(74, 225, 118, 0.4);
+        }
+        .timeline-line {
+            width: 2px;
+            background: linear-gradient(to bottom, #4ae176, #122131);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-dim text-on-surface min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface-container/70 dark:bg-surface-container-high/70 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-3">
+<button class="transition-all duration-200 active:scale-95 p-2 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-secondary">Incident #842</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">IN PROGRESS</span>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a campus security officer with a friendly yet authoritative expression. He is wearing a dark blue tactical uniform with a visible 'Campus Safe' emblem. The background is a slightly blurred university campus quad during a sunny afternoon, conveying a sense of community safety and professional oversight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRFGlq7e5uqb0edqxCUkS5PF_pNIeIygrykbGHRpP9E-4IgyY87rfdrUnK-T8Faw54CT84UHcR4ty0I_vdqiTegg3usL2oOQVorL6suknd_zvxRkPvhVWmJKJ1jlXzL68QD7YyLAB5zyyaRKLWEpSnrg2gCNnLMeubSjOtRYUUJe0ZwgzRaFrMwSQE-6Q5Rm_dxwDpVJeTkuPWJ-hK3Sev7rSwh4ZIarHKDzpzgMmrnvuUDUkbG-X4LfKgVujHsEEvvZxBqL9xkokG"/>
+</div>
+</div>
+</header>
+<main class="pt-20 px-gutter space-y-6">
+<!-- Incident Overview Card -->
+<section class="glass-panel rounded-xl p-5 space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Broken Stair Railing</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Science Wing B, South Entrance</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface-variant">Reported</p>
+<p class="font-data-mono text-data-mono text-primary">Oct 24, 09:15 AM</p>
+</div>
+</div>
+<p class="font-body-md text-body-md leading-relaxed">
+                The handrail on the second flight of stairs in the Science Wing (South) has come loose from the wall. This poses a potential fall hazard for students moving between floors.
+            </p>
+<div class="grid grid-cols-2 gap-3 pt-2">
+<div class="p-3 bg-surface-container-low rounded-lg border border-white/5">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Priority</p>
+<p class="font-headline-md text-headline-md text-tertiary">High Risk</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-white/5">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Category</p>
+<p class="font-headline-md text-headline-md text-secondary">Facility</p>
+</div>
+</div>
+</section>
+<!-- Resolution Timeline -->
+<section class="space-y-4">
+<h3 class="font-label-md text-label-md text-on-surface-variant px-1">RESOLUTION PROGRESS</h3>
+<div class="relative pl-8 space-y-8">
+<!-- Vertical Line -->
+<div class="absolute left-[11px] top-2 bottom-2 w-0.5 bg-surface-variant"></div>
+<div class="absolute left-[11px] top-2 h-[60%] w-0.5 bg-secondary status-glow-active"></div>
+<!-- Step 1: Reported -->
+<div class="relative">
+<div class="absolute -left-8 w-6 h-6 rounded-full bg-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-secondary" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Reported</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Submitted via Student Portal by J. Doe</p>
+<p class="font-data-mono text-[11px] text-primary/60 mt-1">OCT 24, 09:15 AM</p>
+</div>
+</div>
+<!-- Step 2: Assigned -->
+<div class="relative">
+<div class="absolute -left-8 w-6 h-6 rounded-full bg-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-secondary" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Assigned</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Assigned to Facilities Maintenance Team (Shift A)</p>
+<p class="font-data-mono text-[11px] text-primary/60 mt-1">OCT 24, 10:30 AM</p>
+</div>
+</div>
+<!-- Step 3: In Progress -->
+<div class="relative">
+<div class="absolute -left-8 w-6 h-6 rounded-full bg-secondary-container border-2 border-secondary flex items-center justify-center animate-pulse">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-secondary">In Progress</h4>
+<p class="font-body-sm text-body-sm text-on-surface">Team is currently on-site assessing the railing.</p>
+<div class="mt-2 glass-panel p-3 rounded-lg border-secondary/20">
+<p class="font-body-sm text-body-sm text-on-surface italic">"Temporary safety tape applied. Welding team requested for permanent fix."</p>
+<p class="font-label-md text-label-md text-secondary mt-1">— Officer Miller</p>
+</div>
+<p class="font-data-mono text-[11px] text-primary/60 mt-1">OCT 24, 11:45 AM</p>
+</div>
+</div>
+<!-- Step 4: Resolved -->
+<div class="relative">
+<div class="absolute -left-8 w-6 h-6 rounded-full bg-surface-container border-2 border-outline flex items-center justify-center">
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface-variant">Resolved</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Final inspection and sign-off</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Photo Evidence -->
+<section class="space-y-4">
+<div class="flex justify-between items-center px-1">
+<h3 class="font-label-md text-label-md text-on-surface-variant">PHOTO EVIDENCE</h3>
+<span class="font-label-md text-label-md text-primary">3 PHOTOS</span>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-4 snap-x">
+<div class="flex-none w-48 h-32 rounded-xl overflow-hidden glass-panel snap-start">
+<img class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" data-alt="A close-up photograph of a metallic stair railing detached from a concrete wall. The jagged edges of the broken wall anchor are visible, showing cracked grey concrete and a rusted steel bolt. The scene is lit with clinical, high-contrast overhead fluorescent lighting, typical of a modern university science building hallway. Dark slate and forest green tones dominate the surrounding UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDCzsodpt6kPRWjZuv4qJESZRQbx96bxts6s1lCA-47yIKrFga1uhgASG_deLfVFlOsk4TWZww5u6pAZ7QgKQSJzekCDUj7aITundjf5J8q2fUB9lMQ5Wj0JdE_teZg_3bY_HEbeLLqd0nf5RkQsIqG4L1nh-uPwOgM5ZyOnjE3gaWDa8I5j8kIvLyXlcZimPBmIZw7mORArthjPldpsMENo-18FdKlVOPzTaw60sUoIPhf_mUML_b5Nw6ivxkOtQuNu-KgzNdyjcO"/>
+</div>
+<div class="flex-none w-48 h-32 rounded-xl overflow-hidden glass-panel snap-start">
+<img class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" data-alt="A wide-angle shot of a university staircase with bright yellow caution tape wrapped around a section of the railing. The environment is a clean, modern building with glass windows and slate flooring. The mood is urgent but controlled, reflecting a high-stakes safety management environment. Subtle lens flare from the ceiling lights adds a touch of technical sophistication." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9Y_gIS7xPCCLbsdsJBSCrl9FSgbyHX8g8m218ip9dsyw6B7dWEf3Xgr4MhrDva5d2Yf8NDETA4aFRXLeG-QGd_HnKuKXvKEuGUMHW2N4PubAiM-keoH2sfKqZT8-iTMZuXoFRd4InET37JKuYspmu9NInqKGChZDtfon4fq81dv7KgJLuLSU3spFLaUqIdb4SxW7qEmX0XfRCpUZHvQ8v5GtyGteKl6abvr35RSnGuAcrsS3ed_oTXS2qp02fcWCS_oHcgTlVUZF5"/>
+</div>
+<div class="flex-none w-48 h-32 rounded-xl overflow-hidden glass-panel snap-start">
+<div class="w-full h-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-white/10 hover:border-secondary/50 transition-colors">
+<span class="material-symbols-outlined text-primary">add_a_photo</span>
+<span class="font-label-md text-label-md text-primary">ADD PHOTO</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Actions -->
+<section class="pt-4 space-y-3">
+<button class="w-full h-14 bg-secondary text-on-secondary font-headline-md text-[18px] rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-secondary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
+                Contact Supervisor
+            </button>
+<button class="w-full h-14 glass-panel text-on-surface font-headline-md text-[18px] rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined">share</span>
+                Share Report
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Contextual Filter: Active on Report) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center py-2 px-gutter pb-safe bg-surface-container/80 dark:bg-surface-container-highest/80 backdrop-blur-xl border-t border-white/10 shadow-lg md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-90 hover:bg-primary-container/20 px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_alert</span>
+<span class="font-label-md text-label-md">Report</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-90 hover:bg-primary-container/20 px-4 py-1 rounded-full relative" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Alerts</span>
+<div class="absolute top-1 right-5 w-2 h-2 bg-error rounded-full"></div>
+</a>
+</nav>
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 -z-10 pointer-events-none opacity-20">
+
+</div>
+<script>
+        // Simple micro-interaction for photo viewer
+        document.querySelectorAll('img[data-alt]').forEach(img => {
+            img.addEventListener('click', () => {
+                // In a real app, this would open a fullscreen lightbox
+                img.classList.toggle('scale-105');
+                setTimeout(() => img.classList.remove('scale-105'), 200);
+            });
+        });
+    </script>
+</body></html>

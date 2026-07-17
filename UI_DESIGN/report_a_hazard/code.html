@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EHS-AS COOU | Digital Hazard Reporting</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .severity-radio:checked + label {
+            border-color: currentColor;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px currentColor;
+        }
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#00b954",
+                        "on-surface-variant": "#c6c6cd",
+                        "on-secondary": "#003915",
+                        "surface-container": "#122131",
+                        "surface-container-highest": "#273647",
+                        "secondary-fixed": "#6bff8f",
+                        "surface-container-high": "#1c2b3c",
+                        "on-error": "#690005",
+                        "surface-bright": "#2c3a4c",
+                        "outline-variant": "#45464d",
+                        "inverse-surface": "#d4e4fa",
+                        "secondary-fixed-dim": "#4ae176",
+                        "on-surface": "#d4e4fa",
+                        "primary-container": "#0f172a",
+                        "background": "#051424",
+                        "on-primary": "#283044",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-lowest": "#010f1f",
+                        "error": "#ffb4ab",
+                        "surface": "#051424",
+                        "error-container": "#93000a",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-tertiary-container": "#b47300",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary-container": "#004119",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "inverse-on-surface": "#233143",
+                        "on-primary-container": "#798098",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-variant": "#273647",
+                        "outline": "#909097",
+                        "surface-container-low": "#0d1c2d",
+                        "tertiary": "#ffb95f",
+                        "inverse-primary": "#565e74",
+                        "tertiary-container": "#251400",
+                        "surface-dim": "#051424",
+                        "secondary": "#4ae176",
+                        "on-tertiary": "#472a00",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#005321",
+                        "on-background": "#d4e4fa",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-tint": "#bec6e0",
+                        "primary-fixed": "#dae2fd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "primary": "#bec6e0",
+                        "on-secondary-fixed": "#002109"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "sidebar-width-expanded": "240px",
+                        "container-padding": "24px",
+                        "sidebar-width-condensed": "72px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Outfit"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "data-mono": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden min-h-screen bg-background selection:bg-secondary/30">
+<!-- Background Shader Atmosphere -->
+<div class="fixed inset-0 z-0">
+
+</div>
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full flex flex-col z-40 bg-background dark:bg-surface-container-lowest border-r border-white/5 shadow-xl w-sidebar-width-condensed hover:w-sidebar-width-expanded transition-all duration-300 overflow-hidden group">
+<div class="p-6 flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-secondary" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h1 class="font-headline-md text-headline-md font-black text-on-surface whitespace-nowrap">COOU EHS</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Safety Hub</p>
+</div>
+</div>
+<div class="mt-8 flex flex-col gap-2 px-2">
+<a class="flex items-center text-on-surface-variant font-label-md text-label-md p-3 rounded-lg hover:bg-surface-container-highest/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">dashboard</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">Dashboard</span>
+</a>
+<a class="flex items-center border-l-4 border-secondary bg-secondary-container/20 text-secondary font-label-md text-label-md p-3 rounded-r-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">warning</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">Hazard Reports</span>
+</a>
+<a class="flex items-center text-on-surface-variant font-label-md text-label-md p-3 rounded-lg hover:bg-surface-container-highest/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">leaderboard</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">Analytics</span>
+</a>
+<a class="flex items-center text-on-surface-variant font-label-md text-label-md p-3 rounded-lg hover:bg-surface-container-highest/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">history_edu</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">System Logs</span>
+</a>
+<a class="flex items-center text-on-surface-variant font-label-md text-label-md p-3 rounded-lg hover:bg-surface-container-highest/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">settings</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">Settings</span>
+</a>
+</div>
+<div class="mt-auto mb-6 px-4">
+<button class="w-full bg-error-container text-on-error-container rounded-lg p-3 font-label-md text-label-md flex items-center justify-center gap-2 group-hover:px-4 transition-all overflow-hidden">
+<span class="material-symbols-outlined">call</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Emergency Call</span>
+</button>
+</div>
+<div class="mb-6 flex flex-col gap-2 px-2 border-t border-white/5 pt-4">
+<a class="flex items-center text-on-surface-variant font-label-md text-label-md p-3 rounded-lg hover:bg-surface-container-highest/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">help</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">Help</span>
+</a>
+<a class="flex items-center text-on-surface-variant font-label-md text-label-md p-3 rounded-lg hover:bg-surface-container-highest/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4">logout</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="relative z-10 ml-sidebar-width-condensed transition-all duration-300 md:ml-sidebar-width-condensed pt-16 px-container-padding pb-12 flex justify-center items-start min-h-screen">
+<!-- Header Top Bar (Shared Component Hybrid) -->
+<header class="fixed top-0 left-sidebar-width-condensed right-0 z-50 h-16 bg-surface-container/70 backdrop-blur-md flex justify-between items-center px-container-padding border-b border-white/10 shadow-md">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold text-secondary">EHS-AS COOU</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-4">
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#">Dashboard</a>
+<a class="text-secondary font-bold border-b-2 border-secondary" href="#">Hazard Reports</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#">Analytics</a>
+</div>
+<div class="flex items-center gap-3 border-l border-white/10 pl-6">
+<button class="p-2 rounded-full hover:bg-surface-bright/50 transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications_active</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary font-medium">
+<span class="material-symbols-outlined">warning</span>
+                        Alerts
+                    </button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Form Container -->
+<div class="w-full max-w-3xl mt-8">
+<div class="mb-8 text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Report a Digital Hazard</h2>
+<p class="text-on-surface-variant max-w-xl">Please provide accurate details regarding the detected safety risk. Your submission triggers an immediate response protocol within the COOU safety infrastructure.</p>
+</div>
+<form class="glass-panel rounded-xl p-8 shadow-2xl space-y-8">
+<!-- Title Field -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Hazard Title</label>
+<input class="w-full bg-surface-container-low border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary rounded-lg px-4 py-3 text-on-surface transition-all placeholder:text-outline" placeholder="e.g., Chemical Spill in Lab 4B" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Category Dropdown -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Category</label>
+<div class="relative group">
+<select class="w-full bg-surface-container-low border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary rounded-lg px-4 py-3 text-on-surface transition-all appearance-none">
+<option disabled="" selected="" value="">Select Hazard Type</option>
+<option value="waste">Waste Management</option>
+<option value="infrastructure">Infrastructure</option>
+<option value="fire">Fire Safety</option>
+<option value="electrical">Electrical Hazard</option>
+<option value="bio">Biological Risk</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline group-hover:text-secondary transition-colors">keyboard_arrow_down</span>
+</div>
+</div>
+<!-- Location Field -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Exact Location</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary rounded-lg px-4 py-3 pl-11 text-on-surface transition-all placeholder:text-outline" placeholder="Room/Floor/Building" type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">location_on</span>
+</div>
+</div>
+</div>
+<!-- Image Dropzone -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Evidence Documentation</label>
+<div class="relative group">
+<div class="w-full h-48 rounded-xl border-2 border-dashed border-outline-variant group-hover:border-secondary/50 bg-surface-container-lowest/50 flex flex-col items-center justify-center transition-all cursor-pointer overflow-hidden">
+<div class="text-center p-6">
+<span class="material-symbols-outlined text-4xl text-outline group-hover:text-secondary transition-colors mb-2">add_a_photo</span>
+<p class="text-on-surface-variant font-medium">Click to upload or drag and drop</p>
+<p class="text-outline text-xs mt-1">PNG, JPG up to 10MB</p>
+</div>
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+</div>
+</div>
+</div>
+<!-- Severity Selector -->
+<div class="space-y-3">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Severity Level</label>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div>
+<input class="hidden severity-radio peer" id="sev-low" name="severity" type="radio" value="low"/>
+<label class="flex flex-col items-center justify-center p-4 rounded-xl border border-outline-variant bg-surface-container-low cursor-pointer hover:bg-surface-bright/50 transition-all text-secondary-fixed-dim border-l-4" for="sev-low">
+<span class="material-symbols-outlined mb-1">info</span>
+<span class="font-bold text-sm">LOW</span>
+</label>
+</div>
+<div>
+<input class="hidden severity-radio peer" id="sev-medium" name="severity" type="radio" value="medium"/>
+<label class="flex flex-col items-center justify-center p-4 rounded-xl border border-outline-variant bg-surface-container-low cursor-pointer hover:bg-surface-bright/50 transition-all text-tertiary border-l-4" for="sev-medium">
+<span class="material-symbols-outlined mb-1">priority_high</span>
+<span class="font-bold text-sm">MEDIUM</span>
+</label>
+</div>
+<div>
+<input class="hidden severity-radio peer" id="sev-high" name="severity" type="radio" value="high"/>
+<label class="flex flex-col items-center justify-center p-4 rounded-xl border border-outline-variant bg-surface-container-low cursor-pointer hover:bg-surface-bright/50 transition-all text-orange-400 border-l-4" for="sev-high">
+<span class="material-symbols-outlined mb-1">warning</span>
+<span class="font-bold text-sm">HIGH</span>
+</label>
+</div>
+<div>
+<input class="hidden severity-radio peer" id="sev-critical" name="severity" type="radio" value="critical"/>
+<label class="flex flex-col items-center justify-center p-4 rounded-xl border border-outline-variant bg-surface-container-low cursor-pointer hover:bg-surface-bright/50 transition-all text-error border-l-4" for="sev-critical">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">emergency</span>
+<span class="font-bold text-sm">CRITICAL</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Descriptive Notes -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Detailed Description</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary rounded-lg px-4 py-3 text-on-surface transition-all placeholder:text-outline resize-none custom-scrollbar" placeholder="Provide any additional context or immediate actions taken..." rows="4"></textarea>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="flex-1 bg-secondary hover:bg-secondary-container text-on-secondary py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_20px_rgba(74,225,118,0.2)]" type="submit">
+<span class="material-symbols-outlined">send</span>
+                        Submit Hazard Report
+                    </button>
+<button class="px-8 py-4 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-white/5 transition-all font-medium" type="button">
+                        Cancel
+                    </button>
+</div>
+</form>
+<!-- Status Monitoring Footer -->
+<div class="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+                    System Online: Encrypted Response Protocol Active
+                </div>
+<div class="flex items-center gap-4">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container flex items-center justify-center text-[10px] font-bold text-secondary">JH</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container flex items-center justify-center text-[10px] font-bold text-tertiary">ML</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container flex items-center justify-center text-[10px] font-bold text-on-surface-variant">+4</div>
+</div>
+<span class="text-xs text-on-surface-variant">Safety officers currently on-duty</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Side Map Modal Placeholder (Visual Anchor) -->
+<aside class="fixed right-6 bottom-6 z-40 hidden xl:block w-72">
+<div class="glass-panel rounded-xl overflow-hidden shadow-2xl">
+<div class="h-40 relative group">
+<div class="bg-cover bg-center w-full h-full opacity-80 group-hover:scale-110 transition-transform duration-700" data-alt="A clean, dark-themed digital map interface showing a campus layout with green and red safety markers indicating hazard zones and secure areas. The map uses a minimalist slate-blue aesthetic with glowing forest-green data points and crisp white labels for buildings." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDHsIYt3ZMIISdrc2ATq7zWnb3Gpsro--eYOOvUNVyMci7cFmI_zhgwqZQQeb3dz793-v7MgjZr7K0tpSY_ydPb366_tooGwOvLRe7xjDXPCl_36B2Ff-rmfb2TQ93Ou7bPTF8vf3z7WDWMf6yK07NcevKiHpGPog3MSCTUZVWNci0org54p8WyZQgu-WVYNl3A7YuAYBzmLejL8g-4pRkGIoLgOnfZnAt1d31krVAyHv43gRSj0M6d5VUxqVsHY0GXop0Ib6LENdrp')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm">map</span>
+<span class="text-xs font-bold text-on-surface">Campus Safety Map</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest">
+<div class="flex justify-between items-center mb-3">
+<span class="text-xs text-on-surface-variant font-medium">Recent Activity</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold">LIVE</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-3 p-2 rounded-lg bg-white/5 text-[11px]">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="flex-1 text-on-surface">Bio-waste bin full - Hall A</span>
+<span class="text-outline">2m ago</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg bg-white/5 text-[11px]">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="flex-1 text-on-surface">Flickering light - Library</span>
+<span class="text-outline">14m ago</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<script>
+        // Micro-interaction for form feedback
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Processing...`;
+            
+            setTimeout(() => {
+                btn.classList.replace('bg-secondary', 'bg-surface-container-highest');
+                btn.innerHTML = `<span class="material-symbols-outlined text-secondary">check_circle</span> Report Submitted Successfully`;
+                
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.replace('bg-surface-container-highest', 'bg-secondary');
+                    btn.innerHTML = originalContent;
+                    form.reset();
+                }, 3000);
+            }, 1500);
+        });
+
+        // Hover effect for dropzone
+        const dropzone = document.querySelector('input[type="file"]').parentElement;
+        dropzone.addEventListener('dragover', () => dropzone.classList.add('bg-secondary/5'));
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('bg-secondary/5'));
+    </script>
+</body></html>

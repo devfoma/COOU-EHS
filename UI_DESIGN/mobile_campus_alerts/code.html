@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Campus Alerts | Campus Safe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#d4e4fa",
+                    "on-primary-fixed": "#131b2e",
+                    "error": "#ffb4ab",
+                    "primary-fixed": "#dae2fd",
+                    "on-primary-container": "#798098",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-error-container": "#ffdad6",
+                    "surface-dim": "#051424",
+                    "on-primary": "#283044",
+                    "on-background": "#d4e4fa",
+                    "on-secondary": "#003915",
+                    "surface-container-high": "#1c2b3c",
+                    "inverse-on-surface": "#233143",
+                    "tertiary-container": "#251400",
+                    "surface-container-lowest": "#010f1f",
+                    "outline-variant": "#45464d",
+                    "primary": "#bec6e0",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-secondary-container": "#004119",
+                    "outline": "#909097",
+                    "inverse-primary": "#565e74",
+                    "surface": "#051424",
+                    "primary-container": "#0f172a",
+                    "surface-tint": "#bec6e0",
+                    "tertiary": "#ffb95f",
+                    "inverse-surface": "#d4e4fa",
+                    "on-error": "#690005",
+                    "tertiary-fixed": "#ffddb8",
+                    "background": "#051424",
+                    "surface-variant": "#273647",
+                    "on-surface-variant": "#c6c6cd",
+                    "on-tertiary-fixed": "#2a1700",
+                    "secondary-fixed": "#6bff8f",
+                    "on-secondary-fixed-variant": "#005321",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-container-highest": "#273647",
+                    "surface-container": "#122131",
+                    "on-tertiary": "#472a00",
+                    "surface-container-low": "#0d1c2d",
+                    "surface-bright": "#2c3a4c",
+                    "secondary-container": "#00b954",
+                    "secondary": "#4ae176",
+                    "on-tertiary-container": "#b47300",
+                    "on-secondary-fixed": "#002109",
+                    "secondary-fixed-dim": "#4ae176"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "sidebar-width-expanded": "240px",
+                    "sidebar-width-condensed": "72px",
+                    "gutter": "16px",
+                    "container-padding": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "data-mono": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Outfit"],
+                    "display-lg": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .urgent-glow {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+        .safe-glow {
+            box-shadow: 0 0 15px rgba(74, 225, 118, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-dim text-on-surface font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface-container/70 dark:bg-surface-container-high/70 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="security">security</span>
+<h1 class="font-headline-md text-headline-md font-bold text-secondary">Campus Safe</h1>
+</div>
+<div class="w-10 h-10 rounded-full border border-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional student profile avatar for a campus security portal. The student is wearing a neat university hoodie, looking friendly and verified. The lighting is soft and studio-quality, with a blurred modern campus background in cool blue and deep slate tones, maintaining the corporate EHS aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTjNn0vUtk_xpndm_71Rngv41dH1X0-RT259Afr6NSflECls98eh0TSdeuuZdjFFcnZzbbGstrErZnD9scAxbk9iOHyFA67pL5ZT8VYZLZR2RFxZENIJRhXnBHsS1v37pgXuIl6oHIucyqA4_Jaf-089EhXRwrZkul4kGrmVnpYb8zXeQUFPBD1bKlq7WJiStlXbqPN8LrytLw85WzvAqtT50inUoeOgUMqutUrmZ25NxcIk8TDCAjHx4SdiITnjQUhIO27czdd42Y"/>
+</div>
+</header>
+<main class="pt-20 px-gutter space-y-6">
+<!-- Header Section -->
+<section class="mt-4">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Campus Alerts</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Live safety updates & system broadcasts</p>
+</div>
+<div class="flex items-center gap-2 bg-error-container/20 px-3 py-1 rounded-full border border-error/20">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+</span>
+<span class="font-label-md text-label-md text-error">2 CRITICAL</span>
+</div>
+</div>
+</section>
+<!-- Bento Alert Feed -->
+<div class="grid grid-cols-1 gap-4">
+<!-- Critical Alert Card -->
+<div class="glass-panel urgent-glow p-4 rounded-xl border border-error/30 relative overflow-hidden group active:scale-[0.98] transition-transform">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-error text-6xl" data-icon="warning">warning</span>
+</div>
+<div class="flex gap-4 relative z-10">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-error-container" data-icon="emergency" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-headline-md text-error">CHEMICAL SPILL</h3>
+<span class="font-data-mono text-data-mono text-on-surface-variant">2m ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1">Block C Chemistry Lab closed for spill cleanup. HAZMAT teams are on site. Avoid the north perimeter of Block C.</p>
+<div class="mt-4 flex gap-2">
+<span class="px-2 py-0.5 rounded bg-error/10 text-error border border-error/20 font-label-md text-label-md">NORTH CAMPUS</span>
+<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant font-label-md text-label-md">INCIDENT #294</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Urgent Alert Card -->
+<div class="glass-panel p-4 rounded-xl border border-tertiary/30 relative overflow-hidden group active:scale-[0.98] transition-transform">
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container" data-icon="bolt">bolt</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-headline-md text-tertiary">POWER OUTAGE</h3>
+<span class="font-data-mono text-data-mono text-on-surface-variant">14m ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1">Partial grid failure in West Dormitories. Emergency lighting is active. ETA for restoration: 10:30 PM.</p>
+</div>
+</div>
+</div>
+<!-- Standard Notification Row -->
+<div class="glass-panel p-4 rounded-xl border border-white/5 flex gap-4 items-center">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-on-surface">Weather Advisory</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Severe storm warning for the county starting at 11:00 PM.</p>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface-variant text-xs">1h</span>
+</div>
+<!-- Activity Card (Bento Style) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-panel p-4 rounded-xl border border-white/5 space-y-2">
+<span class="material-symbols-outlined text-secondary" data-icon="health_and_safety">health_and_safety</span>
+<h4 class="font-label-md text-label-md text-on-surface">Campus Status</h4>
+<p class="font-display-lg text-display-lg text-secondary leading-none">SAFE</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standard patrol active</p>
+</div>
+<div class="glass-panel p-4 rounded-xl border border-white/5 flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Next Drill</h4>
+<p class="font-headline-md text-headline-md text-primary mt-1">Oct 24</p>
+</div>
+<div class="bg-primary/10 h-1 w-full rounded-full mt-4 overflow-hidden">
+<div class="bg-primary h-full w-2/3"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-right">Fire Safety</p>
+</div>
+</div>
+<!-- System Update -->
+<div class="glass-panel p-4 rounded-xl border border-white/5 flex gap-4 items-center">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="construction">construction</span>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-on-surface">Maintenance Complete</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Elevator in Library Wing B is back in service.</p>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface-variant text-xs">4h</span>
+</div>
+</div>
+<!-- Emergency Contact Quick Action -->
+<div class="mt-8 p-6 rounded-2xl bg-gradient-to-br from-error-container/40 to-surface-container border border-error/20 flex flex-col items-center text-center space-y-4">
+<div class="w-16 h-16 rounded-full bg-error flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-on-error text-3xl" data-icon="call" style="font-variation-settings: 'FILL' 1;">call</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Immediate Assistance?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-[240px] mx-auto">Connect directly to campus security dispatch for life-safety emergencies.</p>
+</div>
+<button class="w-full bg-error hover:bg-red-500 text-white font-bold py-3 rounded-full transition-colors active:scale-95">
+                CALL SECURITY
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center py-2 px-gutter pb-safe bg-surface-container/80 dark:bg-surface-container-highest/80 backdrop-blur-xl border-t border-white/10 rounded-t-xl shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-primary-container/20 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-primary-container/20 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="add_alert">add_alert</span>
+<span class="font-label-md text-label-md">Report</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="font-label-md text-label-md">Alerts</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for alert pulse
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('touchstart', () => {
+                panel.style.transition = 'transform 0.1s ease-out';
+            });
+        });
+
+        // Simulating live time update for data-mono fields
+        function updateTime() {
+            // Logic to occasionally update "m ago" labels if needed for demo
+        }
+        setInterval(updateTime, 60000);
+    </script>
+</body></html>

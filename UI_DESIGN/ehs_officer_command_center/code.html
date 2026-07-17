@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EHS-AS COOU | Officer Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(74, 225, 118, 0.3);
+            background: rgba(30, 41, 59, 0.8);
+        }
+        .glow-crimson { box-shadow: 0 0 15px rgba(255, 180, 171, 0.2); }
+        .glow-amber { box-shadow: 0 0 15px rgba(255, 185, 95, 0.2); }
+        .glow-forest { box-shadow: 0 0 15px rgba(74, 225, 118, 0.2); }
+        
+        /* Custom scrollbar for clinical feel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #051424; }
+        ::-webkit-scrollbar-thumb { background: #273647; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4ae176; }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#00b954",
+                        "on-surface-variant": "#c6c6cd",
+                        "on-secondary": "#003915",
+                        "surface-container": "#122131",
+                        "surface-container-highest": "#273647",
+                        "secondary-fixed": "#6bff8f",
+                        "surface-container-high": "#1c2b3c",
+                        "on-error": "#690005",
+                        "surface-bright": "#2c3a4c",
+                        "outline-variant": "#45464d",
+                        "inverse-surface": "#d4e4fa",
+                        "secondary-fixed-dim": "#4ae176",
+                        "on-surface": "#d4e4fa",
+                        "primary-container": "#0f172a",
+                        "background": "#051424",
+                        "on-primary": "#283044",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-lowest": "#010f1f",
+                        "error": "#ffb4ab",
+                        "surface": "#051424",
+                        "error-container": "#93000a",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-tertiary-container": "#b47300",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary-container": "#004119",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "inverse-on-surface": "#233143",
+                        "on-primary-container": "#798098",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-variant": "#273647",
+                        "outline": "#909097",
+                        "surface-container-low": "#0d1c2d",
+                        "tertiary": "#ffb95f",
+                        "inverse-primary": "#565e74",
+                        "tertiary-container": "#251400",
+                        "surface-dim": "#051424",
+                        "secondary": "#4ae176",
+                        "on-tertiary": "#472a00",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#005321",
+                        "on-background": "#d4e4fa",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-tint": "#bec6e0",
+                        "primary-fixed": "#dae2fd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "primary": "#bec6e0",
+                        "on-secondary-fixed": "#002109"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "sidebar-width-expanded": "240px",
+                        "container-padding": "24px",
+                        "sidebar-width-condensed": "72px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Outfit"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "data-mono": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen flex">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface-container-lowest text-secondary dark:text-secondary-fixed border-r border-white/5 shadow-xl transition-all duration-300 w-sidebar-width-condensed hover:w-sidebar-width-expanded group">
+<div class="flex items-center p-4 gap-4 overflow-hidden h-16 shrink-0">
+<div class="w-10 h-10 bg-secondary-container/20 rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1">shield_with_heart</span>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+<h1 class="font-headline-md text-headline-md font-black text-on-surface">COOU EHS</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Safety Hub</p>
+</div>
+</div>
+<nav class="flex-1 mt-4 space-y-1">
+<a class="flex items-center border-l-4 border-secondary bg-secondary-container/20 text-secondary h-12 px-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="dashboard">dashboard</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Dashboard</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-highest/50 h-12 px-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="warning">warning</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Hazard Reports</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-highest/50 h-12 px-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="leaderboard">leaderboard</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Analytics</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-highest/50 h-12 px-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="history_edu">history_edu</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">System Logs</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-highest/50 h-12 px-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="settings">settings</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-white/5 space-y-1">
+<button class="w-full flex items-center justify-center bg-secondary text-on-secondary font-bold py-2 rounded mb-4 overflow-hidden group-hover:justify-start group-hover:px-4 transition-all">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+<span class="ml-2 hidden group-hover:inline text-xs">Emergency Call</span>
+</button>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-highest/50 h-10 px-5 transition-all" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="help">help</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity">Help</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-highest/50 h-10 px-5 transition-all" href="#">
+<span class="material-symbols-outlined shrink-0" data-icon="logout">logout</span>
+<span class="ml-6 font-label-md text-label-md opacity-0 group-hover:opacity-100 transition-opacity">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-sidebar-width-condensed h-full overflow-hidden flex flex-col relative">
+<!-- Top App Bar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding h-16 bg-surface-container/70 backdrop-blur-md dark:bg-surface-container-high/70 border-b border-white/10 shadow-md">
+<div class="flex items-center gap-8 pl-16">
+<span class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed">EHS-AS COOU</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-secondary font-bold border-b-2 border-secondary h-16 flex items-center px-2" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-bright/50 transition-colors h-16 flex items-center px-2" href="#">Hazard Reports</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-bright/50 transition-colors h-16 flex items-center px-2" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative bg-surface-container-highest/50 rounded-full flex items-center px-4 h-10 border border-white/5">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-on-surface placeholder:text-on-surface-variant/50 w-48" placeholder="Search protocol or officer..." type="text"/>
+</div>
+<button class="p-2 text-secondary hover:bg-surface-bright/50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-secondary hover:bg-surface-bright/50 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+<button class="bg-secondary text-on-secondary px-4 py-1.5 rounded-full font-bold text-sm shadow-lg shadow-secondary/20 hover:scale-105 transition-transform active:scale-95">
+                    Alerts
+                </button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="mt-16 flex-1 flex overflow-hidden">
+<!-- Left Filter Panel -->
+<aside class="w-64 border-r border-white/5 bg-surface-container-low p-6 overflow-y-auto hidden lg:block shrink-0">
+<h3 class="font-headline-md text-sm uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs" data-icon="filter_list">filter_list</span>
+                    Command Filters
+                </h3>
+<div class="space-y-8">
+<section>
+<label class="font-label-md text-on-surface-variant block mb-3">Hazard Category</label>
+<div class="space-y-2">
+<label class="flex items-center gap-3 text-sm cursor-pointer hover:text-secondary transition-colors">
+<input checked="" class="w-4 h-4 rounded border-white/10 bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<span>Chemical Spills</span>
+</label>
+<label class="flex items-center gap-3 text-sm cursor-pointer hover:text-secondary transition-colors">
+<input checked="" class="w-4 h-4 rounded border-white/10 bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<span>Biohazard</span>
+</label>
+<label class="flex items-center gap-3 text-sm cursor-pointer hover:text-secondary transition-colors">
+<input class="w-4 h-4 rounded border-white/10 bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<span>Physical Risk</span>
+</label>
+<label class="flex items-center gap-3 text-sm cursor-pointer hover:text-secondary transition-colors">
+<input class="w-4 h-4 rounded border-white/10 bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<span>Equipment Failure</span>
+</label>
+</div>
+</section>
+<section>
+<label class="font-label-md text-on-surface-variant block mb-3">Priority Level</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="bg-error-container/30 border border-error/20 text-error text-[10px] font-bold py-1 px-2 rounded hover:bg-error-container/50 transition-colors">CRITICAL</button>
+<button class="bg-tertiary-container/30 border border-tertiary/20 text-tertiary text-[10px] font-bold py-1 px-2 rounded hover:bg-tertiary-container/50 transition-colors">WARNING</button>
+<button class="bg-secondary-container/10 border border-secondary/20 text-secondary text-[10px] font-bold py-1 px-2 rounded hover:bg-secondary-container/20 transition-colors">STABLE</button>
+<button class="bg-surface-container-highest/50 border border-white/5 text-on-surface-variant text-[10px] font-bold py-1 px-2 rounded hover:bg-surface-container-highest transition-colors">LOW</button>
+</div>
+</section>
+<section>
+<label class="font-label-md text-on-surface-variant block mb-3">Facility Location</label>
+<select class="w-full bg-surface-container-highest border-none rounded-lg text-sm text-on-surface focus:ring-1 focus:ring-secondary">
+<option>All Zones</option>
+<option>Main Campus Central</option>
+<option>Anambra West Lab</option>
+<option>South-East Medical Center</option>
+</select>
+</section>
+<div class="pt-6">
+<div class="p-4 rounded-xl glass-panel text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<p class="text-xs text-on-surface-variant mb-2">Network Health</p>
+<p class="font-display-lg text-secondary text-2xl">99.8%</p>
+<div class="w-full h-1 bg-surface-container-highest mt-3 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[99.8%] shadow-[0_0_8px_#4ae176]"></div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Scrollable Dashboard -->
+<section class="flex-1 overflow-y-auto p-container-padding space-y-8 pb-12">
+<!-- Headline & Quick Stats -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Officer Command Center</h2>
+<p class="text-on-surface-variant">Real-time Environmental Health &amp; Safety Intelligence Dashboard</p>
+</div>
+<div class="flex gap-4">
+<div class="px-4 py-2 bg-surface-container-high rounded-lg border border-white/5 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">System Live</span>
+</div>
+<button class="bg-secondary-container/20 border border-secondary/50 text-secondary px-6 py-2 rounded-lg font-bold hover:bg-secondary-container/40 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="file_download">file_download</span>
+                            Shift Report
+                        </button>
+</div>
+</div>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="glass-panel p-6 rounded-xl relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-on-surface-variant text-sm font-medium">Active Hazards</p>
+<h3 class="font-display-lg text-headline-lg text-error mt-1">12</h3>
+</div>
+<div class="w-12 h-12 rounded-lg bg-error-container/20 flex items-center justify-center text-error glow-crimson">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-xs text-error font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+<span>4 New since last shift</span>
+</div>
+<!-- Decorative Sparkline Placeholder -->
+<div class="mt-6 h-12 w-full opacity-30 flex items-end gap-1">
+<div class="w-full bg-error rounded-t" style="height: 40%"></div>
+<div class="w-full bg-error rounded-t" style="height: 60%"></div>
+<div class="w-full bg-error rounded-t" style="height: 35%"></div>
+<div class="w-full bg-error rounded-t" style="height: 80%"></div>
+<div class="w-full bg-error rounded-t" style="height: 55%"></div>
+<div class="w-full bg-error rounded-t" style="height: 95%"></div>
+<div class="w-full bg-error rounded-t" style="height: 70%"></div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-xl relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-on-surface-variant text-sm font-medium">Resolved Today</p>
+<h3 class="font-display-lg text-headline-lg text-secondary mt-1">84</h3>
+</div>
+<div class="w-12 h-12 rounded-lg bg-secondary-container/20 flex items-center justify-center text-secondary glow-forest">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-xs text-secondary font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="keyboard_arrow_up">keyboard_arrow_up</span>
+<span>12% Efficiency increase</span>
+</div>
+<div class="mt-6 h-12 w-full opacity-30 flex items-end gap-1">
+<div class="w-full bg-secondary rounded-t" style="height: 20%"></div>
+<div class="w-full bg-secondary rounded-t" style="height: 45%"></div>
+<div class="w-full bg-secondary rounded-t" style="height: 60%"></div>
+<div class="w-full bg-secondary rounded-t" style="height: 55%"></div>
+<div class="w-full bg-secondary rounded-t" style="height: 70%"></div>
+<div class="w-full bg-secondary rounded-t" style="height: 85%"></div>
+<div class="w-full bg-secondary rounded-t" style="height: 90%"></div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-xl relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-on-surface-variant text-sm font-medium">Avg Response Time</p>
+<h3 class="font-display-lg text-headline-lg text-on-surface mt-1">04:12</h3>
+</div>
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-xs text-tertiary font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="bolt">bolt</span>
+<span>Within KPI Target Range</span>
+</div>
+<div class="mt-6 h-12 w-full opacity-30 flex items-end gap-1">
+<div class="w-full bg-on-surface rounded-t" style="height: 70%"></div>
+<div class="w-full bg-on-surface rounded-t" style="height: 65%"></div>
+<div class="w-full bg-on-surface rounded-t" style="height: 60%"></div>
+<div class="w-full bg-on-surface rounded-t" style="height: 58%"></div>
+<div class="w-full bg-on-surface rounded-t" style="height: 55%"></div>
+<div class="w-full bg-on-surface rounded-t" style="height: 52%"></div>
+<div class="w-full bg-on-surface rounded-t" style="height: 50%"></div>
+</div>
+</div>
+</div>
+<!-- Active Incidents Header -->
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-3">
+                        Active Incident Feed
+                        <span class="bg-error-container/20 text-error text-xs px-2 py-0.5 rounded-full animate-pulse border border-error/30">LIVE</span>
+</h3>
+<div class="flex gap-2">
+<button class="p-2 bg-surface-container-highest rounded hover:text-secondary transition-colors"><span class="material-symbols-outlined" data-icon="view_module">view_module</span></button>
+<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined" data-icon="view_list">view_list</span></button>
+</div>
+</div>
+<!-- Incident Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Critical Incident -->
+<div class="glass-panel p-0 rounded-xl overflow-hidden border-l-4 border-l-error group transition-all hover:scale-[1.02]">
+<div class="p-5 flex flex-col h-full">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-error-container/40 text-error text-[10px] font-bold px-2 py-1 rounded tracking-tighter glow-crimson">CRITICAL PRIORITY</span>
+<span class="text-on-surface-variant text-[10px] font-medium font-data-mono">INC-9821</span>
+</div>
+<h4 class="font-headline-md text-lg text-on-surface mb-2">Chemical Leak - Block C-14</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">A hazardous chemical spill has been reported in the ventilation system of the pharmaceutical lab. Immediate evacuation protocol active.</p>
+<div class="flex items-center gap-4 text-xs mb-6">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="location_on">location_on</span>
+<span>Main Lab, Wing B</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="schedule">schedule</span>
+<span>08m ago</span>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">JD</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-secondary-container/40 flex items-center justify-center text-[10px] font-bold">AK</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-on-surface-variant">+3</div>
+</div>
+<button class="bg-error text-on-error px-4 py-1.5 rounded-lg text-xs font-bold hover:brightness-110 transition-all">TAKE ACTION</button>
+</div>
+</div>
+</div>
+<!-- Warning Incident -->
+<div class="glass-panel p-0 rounded-xl overflow-hidden border-l-4 border-l-tertiary group transition-all hover:scale-[1.02]">
+<div class="p-5 flex flex-col h-full">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-tertiary-container/40 text-tertiary text-[10px] font-bold px-2 py-1 rounded tracking-tighter glow-amber">WARNING LEVEL</span>
+<span class="text-on-surface-variant text-[10px] font-medium font-data-mono">INC-9824</span>
+</div>
+<h4 class="font-headline-md text-lg text-on-surface mb-2">Elevator Malfunction</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Elevator E-2 stopped between floors 4 and 5. Sensors indicate 2 persons on board. Communication established.</p>
+<div class="flex items-center gap-4 text-xs mb-6">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="location_on">location_on</span>
+<span>Medical Tower A</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="schedule">schedule</span>
+<span>14m ago</span>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">SR</div>
+</div>
+<button class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-bold hover:brightness-110 transition-all">ASSIGN STAFF</button>
+</div>
+</div>
+</div>
+<!-- Stable Incident -->
+<div class="glass-panel p-0 rounded-xl overflow-hidden border-l-4 border-l-secondary group transition-all hover:scale-[1.02]">
+<div class="p-5 flex flex-col h-full">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-secondary-container/20 text-secondary text-[10px] font-bold px-2 py-1 rounded tracking-tighter">STABLE MONITORING</span>
+<span class="text-on-surface-variant text-[10px] font-medium font-data-mono">INC-9710</span>
+</div>
+<h4 class="font-headline-md text-lg text-on-surface mb-2">Waste Disposal Clearance</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Hazardous waste pickup scheduled for Zone D. Verification of decontamination documents required before exit.</p>
+<div class="flex items-center gap-4 text-xs mb-6">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="location_on">location_on</span>
+<span>Loading Dock 4</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="schedule">schedule</span>
+<span>22m ago</span>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-on-surface-variant">AI</div>
+</div>
+<button class="border border-secondary text-secondary px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-secondary/10 transition-all">CLEAR STATUS</button>
+</div>
+</div>
+</div>
+<!-- Map/Visual Insight Card -->
+<div class="glass-panel p-0 rounded-xl overflow-hidden xl:col-span-2 min-h-[300px] relative group">
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full grayscale opacity-40 mix-blend-screen" data-alt="A sophisticated digital command center map showing a floor plan of a modern medical facility with glowing green and red pulse points indicating safety sensors and active hazard zones. The style is highly technical, blueprint-like, with a dark slate background and high-contrast lines. Cinematic lighting suggests a high-stakes emergency management environment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC3pLcGee-SeUwtj960ZRG50-3vaVUoUshxDRYrqTDQDiNabFyVJbCdY34uBRZuILsy64EYQb4CnZ7nZ43GxXgRvlS5wPZHTug9TITfMHS-Gkr4A6u8A1bDBEToinu7oWr5KWV_01FPUfzHq1Y23dY_nAmEnKVj36wBFOsR5IJcjSzzwXNWaBc13EDUqDLSe-RP35j-pTJgNd2IjBHBACfur8IvtZlgiTjuFbBzjbKDPYkVBHgslbyyorYCFtnXwbrENQKvEYhI1u-i')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+</div>
+<div class="relative z-10 p-6 flex flex-col h-full pointer-events-none">
+<div class="flex justify-between items-center mb-auto">
+<h4 class="text-lg font-headline-md text-on-surface">Campus Heat Map</h4>
+<div class="bg-surface-container/80 backdrop-blur px-3 py-1 rounded text-[10px] font-bold border border-white/10 pointer-events-auto">LIVE SENSOR FEED</div>
+</div>
+<div class="flex gap-4 pointer-events-auto">
+<div class="bg-surface-container-high/90 backdrop-blur p-4 rounded-lg border border-white/5 flex items-center gap-4">
+<div class="text-center border-r border-white/10 pr-4">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase">Staff Online</p>
+<p class="text-xl font-display-lg text-secondary">42</p>
+</div>
+<div class="text-center">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase">Avg Coverage</p>
+<p class="text-xl font-display-lg text-on-surface">94%</p>
+</div>
+</div>
+<button class="bg-secondary/20 hover:bg-secondary/40 backdrop-blur border border-secondary/50 text-secondary px-4 py-2 rounded-lg font-bold text-sm self-end transition-colors pointer-events-auto">
+                                    ENLARGE VIEW
+                                </button>
+</div>
+</div>
+</div>
+<!-- Urgent Protocol List -->
+<div class="glass-panel p-6 rounded-xl flex flex-col">
+<h4 class="text-lg font-headline-md text-on-surface mb-4">Urgent Protocols</h4>
+<div class="space-y-4 flex-1">
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-10 h-10 rounded bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined" data-icon="fire_truck">fire_truck</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-on-surface group-hover:text-error transition-colors">Evacuation Plan B-2</p>
+<p class="text-xs text-on-surface-variant">Last updated 4h ago by Chief Officer</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-10 h-10 rounded bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-on-surface group-hover:text-tertiary transition-colors">Bio-Spill Containment</p>
+<p class="text-xs text-on-surface-variant">Clinical Level 4 standard protocol</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-on-surface group-hover:text-secondary transition-colors">Lockdown Sequence E</p>
+<p class="text-xs text-on-surface-variant">Restricted access protocol</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-white/10 rounded-lg text-sm text-on-surface-variant hover:bg-surface-bright/20 transition-colors">
+                            View All Library
+                        </button>
+</div>
+</div>
+</section>
+</div>
+<!-- System Status Bar -->
+<footer class="h-8 bg-surface-container-lowest border-t border-white/5 flex items-center px-container-padding text-[10px] text-on-surface-variant justify-between font-data-mono z-50">
+<div class="flex items-center gap-6">
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> CLUSTER-ALPHA: ACTIVE</span>
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> DATABASE: SYNCED</span>
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-error"></span> SENSOR-14: FAULT</span>
+</div>
+<div class="flex items-center gap-4 uppercase">
+<span>Shift: Morning [06:00 - 14:00]</span>
+<span id="current-time">10:42:15 AM</span>
+</div>
+</footer>
+</main>
+<!-- Global Floating Action (Suppressed on details per instructions, but useful here as Command Center primary action) -->
+<button class="fixed bottom-12 right-8 w-14 h-14 bg-error text-on-error rounded-full shadow-2xl flex items-center justify-center z-[100] hover:scale-110 active:scale-90 transition-all group overflow-hidden">
+<span class="material-symbols-outlined text-3xl" data-icon="add_alert">add_alert</span>
+<span class="absolute right-full mr-4 bg-error text-on-error px-3 py-1 rounded text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">NEW INCIDENT</span>
+</button>
+<script>
+        // Simple micro-interaction for time
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('current-time').innerText = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Hover effect for glass panels (interactive glow)
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('mousemove', e => {
+                const rect = panel.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                panel.style.setProperty('--mouse-x', `${x}px`);
+                panel.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>
