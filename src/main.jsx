@@ -35,7 +35,7 @@ import {
 import './styles.css';
 
 const BRAND_NAME = 'COUU-EHS';
-const LOGO_URL = new URL('../ASSETS/COOU-EHS LOGO.png', import.meta.url).href;
+const LOGO_URL = new URL('../ASSETS/COOU-EHS LOGO MARK.png', import.meta.url).href;
 
 const incidents = [
   {
@@ -159,7 +159,6 @@ function Brand({ compact = false }) {
       {!compact && (
         <div>
           <strong>{BRAND_NAME}</strong>
-          <span>Safe campus, stronger future</span>
         </div>
       )}
     </div>
@@ -178,7 +177,7 @@ function DesktopApp({ view, setView, metrics, activeIncident }) {
           <NavButton icon={BarChart3} label="Analytics" active={view === 'analytics'} onClick={() => setView('analytics')} />
           <NavButton icon={Settings} label="Settings" />
         </nav>
-        <button className="emergency-button"><Siren size={18} /> Emergency</button>
+        <button className="emergency-button"><Siren size={18} /><span className="button-label">Emergency</span></button>
       </aside>
 
       <div className="desktop-main">

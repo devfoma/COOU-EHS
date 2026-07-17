@@ -67,6 +67,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 76px;
   height: 100vh;
   overflow: hidden;
   padding: 18px 12px;
@@ -78,6 +79,13 @@ button {
 
 .sidebar:hover {
   width: 242px;
+}
+
+.sidebar:not(:hover) .nav-button span,
+.sidebar:not(:hover) .emergency-button .button-label {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
 }
 
 .sidebar nav {
@@ -110,16 +118,6 @@ button {
   font-size: 20px;
   font-weight: 800;
   line-height: 1;
-}
-
-.brand span {
-  display: block;
-  max-width: 220px;
-  margin-top: 5px;
-  color: var(--text-muted);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .brand-compact img {
@@ -156,6 +154,8 @@ button {
 }
 
 .nav-button span {
+  display: inline-block;
+  transition: opacity 180ms ease, width 180ms ease;
   white-space: nowrap;
 }
 
@@ -175,6 +175,12 @@ button {
   color: #ffdad6;
   background: rgba(147, 0, 10, 0.42);
   border-radius: 8px;
+}
+
+.emergency-button .button-label {
+  display: inline-block;
+  transition: opacity 180ms ease, width 180ms ease;
+  white-space: nowrap;
 }
 
 .desktop-main {
@@ -1003,10 +1009,6 @@ button {
 
   .mobile-header .brand strong {
     font-size: 18px;
-  }
-
-  .mobile-header .brand span {
-    display: none;
   }
 
   .mobile-screen {

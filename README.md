@@ -143,11 +143,13 @@ Design characteristics:
 - Dense desktop dashboards for officers/admins.
 - Streamlined mobile workflows for students and staff.
 
-The brand logo is loaded from:
+The app header/sidebar logo is loaded from the cropped mark:
 
 ```text
-ASSETS/COOU-EHS LOGO.png
+ASSETS/COOU-EHS LOGO MARK.png
 ```
+
+The original full logo with text is also kept in `ASSETS/COOU-EHS LOGO.png`.
 
 The visible application brand name is:
 
@@ -170,6 +172,7 @@ The implementation currently uses local mock data in the frontend. It does not y
 ```text
 .
 |-- ASSETS/
+|   |-- COOU-EHS LOGO MARK.png
 |   `-- COOU-EHS LOGO.png
 |-- UI_DESIGN/
 |   |-- DESIGN.md
