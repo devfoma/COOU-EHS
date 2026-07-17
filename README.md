@@ -276,6 +276,8 @@ A complete production version should add:
 - Analytics aggregation.
 - Exportable PDF/CSV reports.
 
+See `FULL_FUNCTIONALITY_ROADMAP.md` for the detailed checklist of backend, database, workflow, security, testing, and deployment work required to make the prototype fully functional.
+
 ## Recommended User Roles
 
 - Student: report hazards and track personal reports.
@@ -290,5 +292,6 @@ A complete production version should add:
 Additional project documentation:
 
 - `TECHNICAL_DESIGN_DOCUMENT.md`: full technical design document.
+- `FULL_FUNCTIONALITY_ROADMAP.md`: implementation checklist for full production functionality.
 - `Okechukwu_Christian_Seminar.md`: original academic/project brief.
 - `UI_DESIGN/DESIGN.md`: design system reference.

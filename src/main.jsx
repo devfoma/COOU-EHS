@@ -221,49 +221,49 @@ function PublicGateway({ onLogin }) {
     <main className="public-shell">
       <header className="public-header">
         <Brand />
-        <span className="public-status">Public information only</span>
+        <span className="public-status">Campus safety portal</span>
       </header>
 
       <section className="public-hero">
         <div>
-          <p className="eyebrow">Environmental Health and Safety</p>
-          <h1>Report hazards. Protect campus. Restrict sensitive EHS data.</h1>
+          <p className="eyebrow">COOU Environmental Health and Safety</p>
+          <h1>A safer campus starts with faster reporting.</h1>
           <p>
-            COUU-EHS centralizes hazard reporting, incident response, campus alerts, and safety analytics for
-            Chukwuemeka Odumegwu Ojukwu University.
+            COUU-EHS helps students, staff, and safety officers report hazards, coordinate response,
+            publish alerts, and keep campus facilities safer for learning and work.
           </p>
         </div>
         <div className="public-card glass-panel">
           <ShieldCheck size={32} />
-          <h2>Protected by role-based access</h2>
-          <p>Real incident data, evidence, exact locations, officer activity, and audit analytics require sign-in.</p>
+          <h2>Built for campus response</h2>
+          <p>Submit reports, track progress, receive alerts, and support accountable EHS operations across COOU.</p>
         </div>
       </section>
 
       <section className="public-grid">
         <article className="glass-panel public-info-card">
-          <h2>What the public can see</h2>
+          <h2>For students and staff</h2>
           <ul>
-            <li>Project purpose and safety education.</li>
-            <li>Approved public emergency contacts.</li>
-            <li>General campus safety guidance.</li>
+            <li>Report hazards from mobile or desktop.</li>
+            <li>Add location, category, severity, and evidence.</li>
+            <li>Track the progress of submitted incidents.</li>
           </ul>
         </article>
         <article className="glass-panel public-info-card restricted">
-          <h2>Restricted operational data</h2>
+          <h2>For EHS teams</h2>
           <ul>
-            <li>Incident reports, evidence, timelines, and tracking IDs.</li>
-            <li>Reporter, staff, officer, and department details.</li>
-            <li>Exact hazard locations, hotspots, analytics, and audits.</li>
+            <li>Review active incident feeds and assignments.</li>
+            <li>Document response timelines and resolutions.</li>
+            <li>Monitor safety trends, audits, and compliance.</li>
           </ul>
         </article>
       </section>
 
       <section className="role-login glass-panel">
         <div>
-          <p className="eyebrow">Demo sign-in</p>
-          <h2>Select an authorized role</h2>
-          <p>This prototype demonstrates frontend role restrictions. Production must enforce the same checks in the backend API.</p>
+          <p className="eyebrow">Access workspace</p>
+          <h2>Continue as a campus user</h2>
+          <p>Select a role to preview the workspace and workflows available to each COUU-EHS user type.</p>
         </div>
         <div className="role-grid">
           {Object.entries(roles).map(([role, config]) => (
