@@ -2,8 +2,6 @@
 
 COUU-EHS is a responsive Environmental Health and Safety Application System for Chukwuemeka Odumegwu Ojukwu University (COOU). The project provides a digital platform for reporting campus hazards, tracking incident response, publishing safety alerts, and reviewing EHS performance analytics.
 
-The application was built from the project seminar brief in `Okechukwu_Christian_Seminar.md` and follows the visual direction in the `UI_DESIGN/` folder. The current implementation is a frontend prototype with realistic mock data, designed to demonstrate both the web and mobile use cases of the system.
-
 ## Project Purpose
 
 Many university environmental health and safety processes are still handled manually through paper records, verbal reports, or disconnected departmental channels. This can cause delayed responses, poor documentation, weak accountability, and limited insight into recurring safety risks.
