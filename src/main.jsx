@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Activity,
@@ -36,6 +36,61 @@ import './styles.css';
 
 const BRAND_NAME = 'COUU-EHS';
 const LOGO_URL = new URL('../ASSETS/COOU-EHS LOGO MARK.png', import.meta.url).href;
+
+const roles = {
+  student: {
+    label: 'Student',
+    description: 'Submit hazards, track your own reports, and receive campus alerts.',
+    permissions: ['report:create', 'report:own', 'alerts:view']
+  },
+  staff: {
+    label: 'Staff',
+    description: 'Report workplace hazards and monitor personal safety submissions.',
+    permissions: ['report:create', 'report:own', 'alerts:view']
+  },
+  officer: {
+    label: 'EHS Officer',
+    description: 'View assigned incidents, update timelines, and submit resolution proof.',
+    permissions: ['report:create', 'incident:assigned', 'incident:resolve', 'alerts:view', 'protocols:view']
+  },
+  supervisor: {
+    label: 'Supervisor',
+    description: 'Assign incidents, approve closures, publish alerts, and review response work.',
+    permissions: ['report:create', 'incident:all', 'incident:resolve', 'incident:assign', 'alerts:manage', 'protocols:view']
+  },
+  admin: {
+    label: 'Administrator',
+    description: 'Manage users, reports, locations, alerts, analytics, and system settings.',
+    permissions: ['report:create', 'incident:all', 'incident:resolve', 'incident:assign', 'alerts:manage', 'analytics:view', 'admin:manage', 'protocols:view']
+  },
+  management: {
+    label: 'Management',
+    description: 'Review institutional EHS performance, compliance trends, and audit summaries.',
+    permissions: ['analytics:view', 'incident:summary', 'alerts:view']
+  }
+};
+
+const defaultDesktopViewByRole = {
+  student: 'report',
+  staff: 'report',
+  officer: 'command',
+  supervisor: 'command',
+  admin: 'command',
+  management: 'analytics'
+};
+
+const defaultMobileViewByRole = {
+  student: 'dashboard',
+  staff: 'dashboard',
+  officer: 'tracker',
+  supervisor: 'alerts',
+  admin: 'alerts',
+  management: 'alerts'
+};
+
+function hasAccess(role, permission) {
+  return roles[role]?.permissions.includes(permission) || false;
+}
 
 const incidents = [
   {
@@ -124,6 +179,7 @@ const activity = [
 ];
 
 function App() {
+  const [session, setSession] = useState(null);
   const [desktopView, setDesktopView] = useState('command');
   const [mobileView, setMobileView] = useState('dashboard');
   const activeIncident = incidents[0];
@@ -135,6 +191,10 @@ function App() {
     { label: 'Compliance', value: '94.8%', trend: 'Annual score', tone: 'safe', icon: ClipboardCheck }
   ], []);
 
+  if (!session) {
+    return <PublicGateway onLogin={(role) => setSession({ role, name: roles[role].label })} />;
+  }
+
   return (
     <main className="app-shell">
       <DesktopApp
@@ -142,12 +202,78 @@ function App() {
         setView={setDesktopView}
         metrics={metrics}
         activeIncident={activeIncident}
+        session={session}
+        onLogout={() => setSession(null)}
       />
       <MobileApp
         view={mobileView}
         setView={setMobileView}
         activeIncident={activeIncident}
+        session={session}
+        onLogout={() => setSession(null)}
       />
+    </main>
+  );
+}
+
+function PublicGateway({ onLogin }) {
+  return (
+    <main className="public-shell">
+      <header className="public-header">
+        <Brand />
+        <span className="public-status">Public information only</span>
+      </header>
+
+      <section className="public-hero">
+        <div>
+          <p className="eyebrow">Environmental Health and Safety</p>
+          <h1>Report hazards. Protect campus. Restrict sensitive EHS data.</h1>
+          <p>
+            COUU-EHS centralizes hazard reporting, incident response, campus alerts, and safety analytics for
+            Chukwuemeka Odumegwu Ojukwu University.
+          </p>
+        </div>
+        <div className="public-card glass-panel">
+          <ShieldCheck size={32} />
+          <h2>Protected by role-based access</h2>
+          <p>Real incident data, evidence, exact locations, officer activity, and audit analytics require sign-in.</p>
+        </div>
+      </section>
+
+      <section className="public-grid">
+        <article className="glass-panel public-info-card">
+          <h2>What the public can see</h2>
+          <ul>
+            <li>Project purpose and safety education.</li>
+            <li>Approved public emergency contacts.</li>
+            <li>General campus safety guidance.</li>
+          </ul>
+        </article>
+        <article className="glass-panel public-info-card restricted">
+          <h2>Restricted operational data</h2>
+          <ul>
+            <li>Incident reports, evidence, timelines, and tracking IDs.</li>
+            <li>Reporter, staff, officer, and department details.</li>
+            <li>Exact hazard locations, hotspots, analytics, and audits.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section className="role-login glass-panel">
+        <div>
+          <p className="eyebrow">Demo sign-in</p>
+          <h2>Select an authorized role</h2>
+          <p>This prototype demonstrates frontend role restrictions. Production must enforce the same checks in the backend API.</p>
+        </div>
+        <div className="role-grid">
+          {Object.entries(roles).map(([role, config]) => (
+            <button key={role} className="role-card" type="button" onClick={() => onLogin(role)}>
+              <strong>{config.label}</strong>
+              <span>{config.description}</span>
+            </button>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
@@ -165,17 +291,33 @@ function Brand({ compact = false }) {
   );
 }
 
-function DesktopApp({ view, setView, metrics, activeIncident }) {
+function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout }) {
+  const role = session.role;
+  const desktopViews = [
+    { id: 'command', label: 'Dashboard', icon: LayoutDashboard, permission: 'incident:assigned' },
+    { id: 'report', label: 'Hazard Reports', icon: AlertTriangle, permission: 'report:create' },
+    { id: 'timeline', label: 'Incident Timeline', icon: FileText, permission: 'incident:resolve' },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, permission: 'analytics:view' }
+  ].filter((item) => hasAccess(role, item.permission) || (item.id === 'command' && hasAccess(role, 'incident:all')));
+  const allowedViewIds = desktopViews.map((item) => item.id);
+
+  useEffect(() => {
+    if (!allowedViewIds.includes(view)) {
+      setView(defaultDesktopViewByRole[role] || allowedViewIds[0] || 'report');
+    }
+  }, [allowedViewIds, role, setView, view]);
+
+  const activeView = allowedViewIds.includes(view) ? view : (defaultDesktopViewByRole[role] || allowedViewIds[0]);
+
   return (
     <section className="desktop-app">
       <aside className="sidebar">
         <Brand compact />
         <nav>
-          <NavButton icon={LayoutDashboard} label="Dashboard" active={view === 'command'} onClick={() => setView('command')} />
-          <NavButton icon={AlertTriangle} label="Hazard Reports" active={view === 'report'} onClick={() => setView('report')} />
-          <NavButton icon={FileText} label="Incident Timeline" active={view === 'timeline'} onClick={() => setView('timeline')} />
-          <NavButton icon={BarChart3} label="Analytics" active={view === 'analytics'} onClick={() => setView('analytics')} />
-          <NavButton icon={Settings} label="Settings" />
+          {desktopViews.map((item) => (
+            <NavButton key={item.id} icon={item.icon} label={item.label} active={activeView === item.id} onClick={() => setView(item.id)} />
+          ))}
+          {hasAccess(role, 'admin:manage') && <NavButton icon={Settings} label="Settings" />}
         </nav>
         <button className="emergency-button"><Siren size={18} /><span className="button-label">Emergency</span></button>
       </aside>
@@ -184,24 +326,55 @@ function DesktopApp({ view, setView, metrics, activeIncident }) {
         <header className="topbar">
           <Brand />
           <div className="desktop-tabs">
-            <button className={view === 'command' ? 'active' : ''} onClick={() => setView('command')}>Dashboard</button>
-            <button className={view === 'report' ? 'active' : ''} onClick={() => setView('report')}>Hazard Reports</button>
-            <button className={view === 'analytics' ? 'active' : ''} onClick={() => setView('analytics')}>Analytics</button>
+            {desktopViews.slice(0, 3).map((item) => (
+              <button key={item.id} className={activeView === item.id ? 'active' : ''} onClick={() => setView(item.id)}>{item.label}</button>
+            ))}
           </div>
           <div className="topbar-actions">
             <label className="search-box">
               <Search size={16} />
               <input placeholder="Search incident, protocol, officer..." />
             </label>
+            <AccessBadge role={role} />
             <button className="icon-button" aria-label="Notifications"><Bell size={20} /></button>
-            <button className="icon-button" aria-label="Profile"><UserCircle size={20} /></button>
+            <button className="icon-button" aria-label="Sign out" onClick={onLogout}><UserCircle size={20} /></button>
           </div>
         </header>
 
-        {view === 'command' && <CommandCenter metrics={metrics} />}
-        {view === 'report' && <ReportHazard />}
-        {view === 'timeline' && <IncidentTimeline incident={activeIncident} />}
-        {view === 'analytics' && <Analytics metrics={metrics} />}
+        {activeView === 'command' && <Protected permission="incident:assigned" role={role} fallbackPermission="incident:all"><CommandCenter metrics={metrics} role={role} /></Protected>}
+        {activeView === 'report' && <Protected permission="report:create" role={role}><ReportHazard role={role} /></Protected>}
+        {activeView === 'timeline' && <Protected permission="incident:resolve" role={role}><IncidentTimeline incident={activeIncident} role={role} /></Protected>}
+        {activeView === 'analytics' && <Protected permission="analytics:view" role={role}><Analytics metrics={metrics} role={role} /></Protected>}
+      </div>
+    </section>
+  );
+}
+
+function AccessBadge({ role }) {
+  return (
+    <span className="access-badge">
+      <ShieldCheck size={15} />
+      {roles[role]?.label || role}
+    </span>
+  );
+}
+
+function Protected({ role, permission, fallbackPermission, children }) {
+  if (hasAccess(role, permission) || (fallbackPermission && hasAccess(role, fallbackPermission))) {
+    return children;
+  }
+
+  return <RestrictedScreen role={role} permission={permission} />;
+}
+
+function RestrictedScreen({ role, permission }) {
+  return (
+    <section className="screen">
+      <div className="restricted-screen glass-panel">
+        <ShieldCheck size={40} />
+        <p className="eyebrow">Restricted area</p>
+        <h1>Access is limited for {roles[role]?.label || role}</h1>
+        <p>This screen requires the permission `{permission}`. Sensitive EHS operational data is hidden unless the signed-in role needs it.</p>
       </div>
     </section>
   );
@@ -528,24 +701,41 @@ function Analytics({ metrics }) {
   );
 }
 
-function MobileApp({ view, setView, activeIncident }) {
+function MobileApp({ view, setView, activeIncident, session, onLogout }) {
+  const role = session.role;
+  const mobileViews = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home, permission: 'report:own' },
+    { id: 'report', label: 'Report', icon: Plus, permission: 'report:create' },
+    { id: 'tracker', label: 'Tracker', icon: FileText, permission: 'report:own', fallbackPermission: 'incident:resolve' },
+    { id: 'alerts', label: 'Alerts', icon: Bell, permission: 'alerts:view', fallbackPermission: 'alerts:manage' }
+  ].filter((item) => hasAccess(role, item.permission) || (item.fallbackPermission && hasAccess(role, item.fallbackPermission)));
+  const allowedViewIds = mobileViews.map((item) => item.id);
+
+  useEffect(() => {
+    if (!allowedViewIds.includes(view)) {
+      setView(defaultMobileViewByRole[role] || allowedViewIds[0] || 'alerts');
+    }
+  }, [allowedViewIds, role, setView, view]);
+
+  const activeView = allowedViewIds.includes(view) ? view : (defaultMobileViewByRole[role] || allowedViewIds[0]);
+
   return (
     <section className="mobile-app">
       <header className="mobile-header">
         <Brand />
-        <button className="icon-button" aria-label="Open menu"><Menu size={20} /></button>
+        <AccessBadge role={role} />
+        <button className="icon-button" aria-label="Sign out" onClick={onLogout}><Menu size={20} /></button>
       </header>
 
-      {view === 'dashboard' && <MobileDashboard />}
-      {view === 'report' && <MobileReport />}
-      {view === 'tracker' && <MobileTracker incident={activeIncident} />}
-      {view === 'alerts' && <MobileAlerts />}
+      {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard /></Protected>}
+      {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport /></Protected>}
+      {activeView === 'tracker' && <Protected role={role} permission="report:own" fallbackPermission="incident:resolve"><MobileTracker incident={activeIncident} /></Protected>}
+      {activeView === 'alerts' && <Protected role={role} permission="alerts:view" fallbackPermission="alerts:manage"><MobileAlerts role={role} /></Protected>}
 
       <nav className="mobile-nav">
-        <MobileNavButton icon={Home} label="Dashboard" active={view === 'dashboard'} onClick={() => setView('dashboard')} />
-        <MobileNavButton icon={Plus} label="Report" active={view === 'report'} onClick={() => setView('report')} />
-        <MobileNavButton icon={FileText} label="Tracker" active={view === 'tracker'} onClick={() => setView('tracker')} />
-        <MobileNavButton icon={Bell} label="Alerts" active={view === 'alerts'} onClick={() => setView('alerts')} />
+        {mobileViews.map((item) => (
+          <MobileNavButton key={item.id} icon={item.icon} label={item.label} active={activeView === item.id} onClick={() => setView(item.id)} />
+        ))}
       </nav>
     </section>
   );

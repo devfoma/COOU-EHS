@@ -227,6 +227,40 @@ The application is responsive:
 
 The app includes interactive navigation between the implemented screens, but data is currently static mock data. Form submissions and buttons are visual demonstrations only and do not yet persist records.
 
+The prototype now starts from a public gateway and requires role selection before protected screens are shown. This demonstrates the intended access-control model:
+
+- Public users can only see general project purpose and approved safety information.
+- Students and staff can report hazards, view their own reports, and receive alerts.
+- EHS officers can access assigned incident workflows and resolution tools.
+- Supervisors can manage response workflows and alerts.
+- Administrators can access operational dashboards, analytics, and management areas.
+- Management users can review high-level analytics without operational edit actions.
+
+## Privacy and Access Restrictions
+
+The following data should not be disclosed publicly:
+
+- Incident reports, descriptions, evidence files, and tracking IDs.
+- Reporter, staff, officer, department, address, and contact details.
+- Exact hazard locations such as room, floor, lab, coordinates, and hotspots.
+- Officer command center data, assignments, protocols, and internal response status.
+- Incident timelines, resolution notes, safety measurements, and compliance signoff records.
+- Analytics, audit observations, compliance scores, department efficiency, and recurring risk trends.
+- User management, role configuration, category setup, and system settings.
+
+The frontend demonstrates these restrictions through role-based screen visibility. A production backend must enforce the same permissions on every API request, because hiding UI elements alone is not security.
+
+Recommended backend controls:
+
+- Require authentication for all operational dashboards and APIs.
+- Validate role permissions on every endpoint.
+- Filter report queries by ownership and role.
+- Store evidence files outside public web roots.
+- Use signed temporary URLs for evidence access.
+- Audit all sensitive actions such as assignments, status changes, closures, exports, and user updates.
+- Mask or redact sensitive fields when a role only needs summary data.
+- Use HTTPS, secure sessions, password hashing, and session expiry.
+
 ## Future Backend Implementation
 
 A complete production version should add:

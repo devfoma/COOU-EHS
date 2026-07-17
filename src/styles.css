@@ -50,6 +50,159 @@ button {
     linear-gradient(145deg, #051424 0%, #010f1f 48%, #0d1c2d 100%);
 }
 
+.public-shell {
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(74, 225, 118, 0.16), transparent 28%),
+    linear-gradient(145deg, #051424 0%, #010f1f 58%, #0d1c2d 100%);
+}
+
+.public-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1180px;
+  margin: 0 auto 64px;
+}
+
+.public-status,
+.access-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--green);
+  background: rgba(74, 225, 118, 0.1);
+  border: 1px solid rgba(74, 225, 118, 0.28);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.public-hero,
+.public-grid,
+.role-login {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.public-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px;
+  align-items: end;
+}
+
+.public-hero h1 {
+  max-width: 780px;
+  margin: 10px 0 16px;
+  font-family: Outfit, Inter, sans-serif;
+  font-size: clamp(40px, 7vw, 76px);
+  line-height: 0.96;
+}
+
+.public-hero p,
+.public-card p,
+.role-login p,
+.public-info-card li,
+.restricted-screen p {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.public-card,
+.public-info-card,
+.role-login,
+.restricted-screen {
+  padding: 24px;
+}
+
+.public-card svg,
+.restricted-screen svg {
+  color: var(--green);
+}
+
+.public-card h2,
+.public-info-card h2,
+.role-login h2,
+.restricted-screen h1 {
+  margin: 12px 0 8px;
+  font-family: Outfit, Inter, sans-serif;
+}
+
+.public-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.public-info-card ul {
+  margin: 14px 0 0;
+  padding-left: 20px;
+}
+
+.public-info-card.restricted {
+  border-color: rgba(255, 180, 171, 0.26);
+}
+
+.role-login {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.role-card {
+  min-height: 150px;
+  padding: 16px;
+  color: var(--text);
+  background: rgba(13, 28, 45, 0.74);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.role-card:hover,
+.role-card:focus-visible {
+  border-color: rgba(74, 225, 118, 0.48);
+  outline: 0;
+  box-shadow: var(--shadow-green);
+}
+
+.role-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--green);
+  font-family: Outfit, Inter, sans-serif;
+  font-size: 18px;
+}
+
+.role-card span {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.restricted-screen {
+  display: grid;
+  min-height: 360px;
+  place-content: center;
+  text-align: center;
+}
+
 .desktop-app {
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr);
@@ -979,6 +1132,32 @@ button {
     background: var(--background);
   }
 
+  .public-shell {
+    padding: 16px;
+  }
+
+  .public-header {
+    margin-bottom: 32px;
+  }
+
+  .public-status {
+    display: none;
+  }
+
+  .public-hero,
+  .public-grid,
+  .role-login {
+    grid-template-columns: 1fr;
+  }
+
+  .public-hero h1 {
+    font-size: 42px;
+  }
+
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+
   .desktop-app {
     display: none;
   }
@@ -993,13 +1172,22 @@ button {
     position: sticky;
     top: 0;
     z-index: 10;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding: 14px 16px;
     background: rgba(5, 20, 36, 0.9);
     border-bottom: 1px solid var(--outline);
     backdrop-filter: blur(18px);
+  }
+
+  .mobile-header .access-badge {
+    max-width: 112px;
+    min-height: 32px;
+    overflow: hidden;
+    padding: 0 9px;
+    text-overflow: ellipsis;
   }
 
   .mobile-header .brand img {
