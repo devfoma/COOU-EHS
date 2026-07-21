@@ -43,6 +43,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 .app-shell {
   min-height: 100vh;
   background:
@@ -114,6 +119,19 @@ button {
 .restricted-screen p {
   color: var(--text-muted);
   line-height: 1.6;
+}
+
+.landing-actions,
+.auth-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.auth-cta-group {
+  align-content: start;
+  align-items: start;
 }
 
 .public-card,
@@ -194,6 +212,242 @@ button {
   color: var(--text-muted);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.role-card.static {
+  cursor: default;
+}
+
+.role-card.static:hover {
+  border-color: var(--outline);
+  box-shadow: none;
+}
+
+.dashboard-routes {
+  margin-bottom: 40px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px;
+  background: rgba(1, 15, 31, 0.64);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+}
+
+.auth-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.auth-tabs button.active {
+  color: var(--surface-lowest);
+  background: var(--green);
+}
+
+.auth-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-form input,
+.auth-form select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  color: var(--text);
+  background: rgba(1, 15, 31, 0.72);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  outline: 0;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  border-color: rgba(74, 225, 118, 0.64);
+  box-shadow: var(--shadow-green);
+}
+
+.input-with-icon {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  background: rgba(1, 15, 31, 0.72);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+}
+
+.input-with-icon:focus-within {
+  border-color: rgba(74, 225, 118, 0.64);
+  box-shadow: var(--shadow-green);
+}
+
+.input-with-icon svg {
+  color: var(--green);
+}
+
+.input-with-icon input {
+  min-height: 44px;
+  padding-left: 0;
+  background: transparent;
+  border: 0;
+}
+
+.input-with-icon input:focus {
+  box-shadow: none;
+}
+
+.auth-error,
+.auth-message {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.auth-error {
+  color: var(--red);
+  background: rgba(147, 0, 10, 0.24);
+  border: 1px solid rgba(255, 180, 171, 0.26);
+}
+
+.auth-message {
+  color: var(--green);
+  background: rgba(74, 225, 118, 0.1);
+  border: 1px solid rgba(74, 225, 118, 0.28);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(1, 15, 31, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.modal-card {
+  width: min(100%, 620px);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding: 22px;
+  background: rgba(18, 33, 49, 0.94);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.42);
+}
+
+.auth-modal {
+  width: min(100%, 680px);
+}
+
+.profile-modal {
+  width: min(100%, 480px);
+}
+
+.modal-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 6px 0 0;
+  font-family: Outfit, Inter, sans-serif;
+  font-size: 28px;
+}
+
+.profile-summary {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  background: rgba(1, 15, 31, 0.5);
+  border: 1px solid var(--outline);
+  border-radius: 10px;
+}
+
+.profile-avatar {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  color: var(--green);
+  background: rgba(74, 225, 118, 0.1);
+  border-radius: 999px;
+}
+
+.profile-summary strong,
+.profile-summary span {
+  display: block;
+}
+
+.profile-summary strong {
+  color: var(--text);
+  font-family: Outfit, Inter, sans-serif;
+  font-size: 20px;
+}
+
+.profile-summary span {
+  margin-top: 4px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.profile-access-list {
+  margin-top: 18px;
+}
+
+.profile-access-list h3 {
+  margin: 0 0 10px;
+  font-family: Outfit, Inter, sans-serif;
+  font-size: 18px;
+}
+
+.profile-access-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 8px 8px 0;
+  padding: 7px 10px;
+  color: var(--green);
+  background: rgba(74, 225, 118, 0.1);
+  border: 1px solid rgba(74, 225, 118, 0.24);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+  margin-top: 22px;
 }
 
 .restricted-screen {
@@ -1152,6 +1406,28 @@ button {
 
   .public-hero h1 {
     font-size: 42px;
+  }
+
+  .landing-actions,
+  .auth-cta-group,
+  .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .modal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .modal-card {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 24px;
   }
 
   .role-grid {

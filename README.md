@@ -1,297 +1,71 @@
-# COUU-EHS
+# COUU-EHS (Environmental Health and Safety System)
 
-COUU-EHS is a responsive Environmental Health and Safety Application System for Chukwuemeka Odumegwu Ojukwu University (COOU). The project provides a digital platform for reporting campus hazards, tracking incident response, publishing safety alerts, and reviewing EHS performance analytics.
+COUU-EHS is a responsive Environmental Health and Safety Application System designed for Chukwuemeka Odumegwu Ojukwu University (COOU). The platform enables digital reporting of campus hazards, response tracking, safety alert publication, and compliance reporting.
 
-## Project Purpose
+## 🚀 Features
 
-Many university environmental health and safety processes are still handled manually through paper records, verbal reports, or disconnected departmental channels. This can cause delayed responses, poor documentation, weak accountability, and limited insight into recurring safety risks.
+- **Triage Command Center:** EHS officers and supervisors can monitor active hazards, update timelines, and authorize closure requests.
+- **Digital Field Reporting:** Students and staff can submit safety hazards with location, category, severity, and photo evidence.
+- **Real-Time Safety Alerts:** Emergency notifications targeting specific campus sectors.
+- **Unified Safety Metrics:** Live counts for compliance reviews and performance audits.
 
-COUU-EHS addresses these problems by centralizing EHS reporting and response workflows in one system. Students and staff can quickly report hazards, while EHS officers and administrators can monitor, prioritize, assign, resolve, and audit safety incidents.
+---
 
-## Key Use Cases Implemented
+## 🛠️ Backend Stack (Supabase Integration)
 
-### 1. Campus User Safety Dashboard
+The application features a full Supabase integration. When configured, it fetches and mutates database tables in real-time. If environment parameters are missing, the system gracefully falls back to mock storage.
 
-The mobile dashboard gives students and staff a simple view of their safety activity.
+### 1. Database Tables Schema
+Run the SQL queries in [supabase_schema.sql](file:///c:/Users/U%20S%20E%20R/Drips/Devfoma/Final/Christian/Environmental_health/supabase_schema.sql) in your Supabase SQL Editor to provision the database:
 
-Implemented features:
+* **`profiles`:** User table mapping Auth IDs to roles (`student`, `staff`, `officer`, `supervisor`, `admin`, `management`).
+* **`hazard_reports`:** Records incidents, status workflows (`Reported`, `Assigned`, `In Progress`, `Resolved`), priorities, and response assignments.
+* **`alerts`:** Broad warnings or routine drills pushed to campus portals.
+* **`activity_logs`:** History of actions taken by safety personnel.
 
-- Total reports submitted.
-- Resolved case count.
-- Active report cards.
-- Recent activity feed.
-- Mobile-first bottom navigation.
+---
 
-This use case supports students and staff who need quick visibility into the hazards they have reported and the progress made by the EHS team.
+## ⚙️ Configuration & Setup
 
-### 2. Hazard Reporting
-
-The hazard reporting workflow allows a campus user to submit a safety issue with structured details.
-
-Implemented features:
-
-- Hazard category selection.
-- Location input.
-- Evidence upload area.
-- Risk/severity selector.
-- Incident description field.
-- Submit hazard report action.
-
-Desktop and mobile versions are implemented. The mobile flow is optimized for fast field reporting, while the desktop flow provides a fuller form layout.
-
-Example hazards supported by the interface:
-
-- Waste management issues.
-- Infrastructure defects.
-- Electrical hazards.
-- Fire safety risks.
-- Laboratory or biological risks.
-- Sanitation concerns.
-
-### 3. Incident Tracking
-
-The incident tracker shows the progress of a submitted report from creation to resolution.
-
-Implemented features:
-
-- Incident ID display.
-- Risk and category summary.
-- Resolution progress timeline.
-- Status steps such as Reported, Assigned, In Progress, and Resolved.
-- Notification and sharing actions.
-
-This use case helps reporters stay informed and reduces the need for manual follow-up.
-
-### 4. Campus Alerts
-
-The campus alerts screen communicates urgent and routine safety notices.
-
-Implemented features:
-
-- Critical alert cards.
-- Warning alert cards.
-- Informational/safe status alerts.
-- Location and active time labels.
-- Immediate assistance call-to-action.
-
-This use case supports emergency communication during incidents such as chemical spills, power outages, blocked emergency exits, or sanitation drills.
-
-### 5. EHS Officer Command Center
-
-The desktop command center supports EHS officers and supervisors who manage active incidents.
-
-Implemented features:
-
-- Active hazard KPI cards.
-- Resolved today metric.
-- Average response time metric.
-- Incident filter panel.
-- Active incident feed.
-- Severity-based incident cards.
-- Campus heat map placeholder.
-- Urgent protocol shortcuts.
-
-This use case is intended for operational safety teams who need a real-time overview of campus risks and response activity.
-
-### 6. Incident Timeline and Resolution
-
-The incident detail view supports officers as they document response actions and close out incidents.
-
-Implemented features:
-
-- Incident tracking ID.
-- Severity chip.
-- Resolution timeline.
-- Final disposition summary field.
-- Safety measurement fields such as air quality and surface pH.
-- Post-cleanup evidence upload area.
-- Compliance signoff checkbox.
-- Submit resolution action.
-
-This use case models the accountability trail needed for safety documentation and audit readiness.
-
-### 7. Analytics and Compliance Audit
-
-The analytics screen gives administrators and management a high-level view of safety performance.
-
-Implemented features:
-
-- Compliance score.
-- Active hazards count.
-- Average response time.
-- Annual audit progress.
-- Incident trend visualization.
-- Audit observations.
-- Export audit action.
-
-This use case supports institutional decision-making, compliance reporting, and identification of recurring hazard hotspots.
-
-## Design Implementation
-
-The UI follows the `Clinical Clarity & Safety` design system provided in `UI_DESIGN/DESIGN.md`.
-
-Design characteristics:
-
-- Dark clinical/corporate interface.
-- Glassmorphism-inspired panels.
-- High-contrast readable text.
-- Green for safety and positive action.
-- Amber for warnings.
-- Red for critical hazards.
-- Dense desktop dashboards for officers/admins.
-- Streamlined mobile workflows for students and staff.
-
-The app header/sidebar logo is loaded from the cropped mark:
-
-```text
-ASSETS/COOU-EHS LOGO MARK.png
-```
-
-The original full logo with text is also kept in `ASSETS/COOU-EHS LOGO.png`.
-
-The visible application brand name is:
-
-```text
-COUU-EHS
-```
-
-## Tech Stack
-
-- React
-- Vite
-- JavaScript
-- CSS
-- Lucide React icons
-
-The implementation currently uses local mock data in the frontend. It does not yet include a database, authentication server, or production backend API.
-
-## Project Structure
-
-```text
-.
-|-- ASSETS/
-|   |-- COOU-EHS LOGO MARK.png
-|   `-- COOU-EHS LOGO.png
-|-- UI_DESIGN/
-|   |-- DESIGN.md
-|   |-- ehs_officer_command_center/
-|   |-- incident_details_timeline/
-|   |-- mobile_campus_alerts/
-|   |-- mobile_incident_tracker/
-|   |-- mobile_my_safety_dashboard/
-|   |-- mobile_report_a_hazard/
-|   |-- report_a_hazard/
-|   `-- safety_analytics_audits/
-|-- src/
-|   |-- main.jsx
-|   `-- styles.css
-|-- index.html
-|-- package.json
-|-- package-lock.json
-|-- Okechukwu_Christian_Seminar.md
-`-- TECHNICAL_DESIGN_DOCUMENT.md
-```
-
-## Getting Started
-
-Install dependencies:
-
+### Step 1: Clone and Install Dependencies
 ```bash
 npm install
 ```
 
-Run the development server:
+### Step 2: Supabase Environment Variables
+Create a `.env` file in the root directory and add your Supabase project parameters:
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
+### Step 3: Run the Application Locally
+To start the Vite development server:
 ```bash
 npm run dev
 ```
 
-Build for production:
+### Step 4: Authentication and Role Routing
+The landing page gives first-time users practical guidance about what to report, what details to prepare, and how reports are tracked after submission. Sign-in and sign-up open as modals so users can authenticate without leaving the public information page.
 
+The sign-in modal uses Supabase Auth email/password sessions. On signup, the app creates a linked `profiles` row for student or staff users. Operational dashboards are not selected in the browser; they are routed from `profiles.role` in Supabase.
+
+Authenticated users can open their profile from the header to review their role and workspace access. Signing out is now an explicit action inside the profile modal.
+
+To grant elevated dashboards, update the user's `profiles.role` value in Supabase to one of:
+`officer`, `supervisor`, `admin`, or `management`.
+
+### Step 5: Build for Production
+To bundle the frontend with assets:
 ```bash
 npm run build
 ```
 
-Preview the production build:
+---
 
-```bash
-npm run preview
-```
+## 🔒 Security & Row Level Security (RLS)
 
-## Current Frontend Behavior
-
-The application is responsive:
-
-- Desktop and tablet widths show the web/officer/admin experience.
-- Mobile widths show the campus-user mobile experience.
-
-The app includes interactive navigation between the implemented screens, but data is currently static mock data. Form submissions and buttons are visual demonstrations only and do not yet persist records.
-
-The prototype now starts from a public gateway and requires role selection before protected screens are shown. This demonstrates the intended access-control model:
-
-- Public users can only see general project purpose and approved safety information.
-- Students and staff can report hazards, view their own reports, and receive alerts.
-- EHS officers can access assigned incident workflows and resolution tools.
-- Supervisors can manage response workflows and alerts.
-- Administrators can access operational dashboards, analytics, and management areas.
-- Management users can review high-level analytics without operational edit actions.
-
-## Privacy and Access Restrictions
-
-The following data should not be disclosed publicly:
-
-- Incident reports, descriptions, evidence files, and tracking IDs.
-- Reporter, staff, officer, department, address, and contact details.
-- Exact hazard locations such as room, floor, lab, coordinates, and hotspots.
-- Officer command center data, assignments, protocols, and internal response status.
-- Incident timelines, resolution notes, safety measurements, and compliance signoff records.
-- Analytics, audit observations, compliance scores, department efficiency, and recurring risk trends.
-- User management, role configuration, category setup, and system settings.
-
-The frontend demonstrates these restrictions through role-based screen visibility. A production backend must enforce the same permissions on every API request, because hiding UI elements alone is not security.
-
-Recommended backend controls:
-
-- Require authentication for all operational dashboards and APIs.
-- Validate role permissions on every endpoint.
-- Filter report queries by ownership and role.
-- Store evidence files outside public web roots.
-- Use signed temporary URLs for evidence access.
-- Audit all sensitive actions such as assignments, status changes, closures, exports, and user updates.
-- Mask or redact sensitive fields when a role only needs summary data.
-- Use HTTPS, secure sessions, password hashing, and session expiry.
-
-## Future Backend Implementation
-
-A complete production version should add:
-
-- User authentication and role-based access.
-- Hazard report API.
-- Incident assignment workflow.
-- Evidence upload storage.
-- Campus alert publishing.
-- Notification delivery.
-- MySQL or PostgreSQL database.
-- Audit logging.
-- Analytics aggregation.
-- Exportable PDF/CSV reports.
-
-See `FULL_FUNCTIONALITY_ROADMAP.md` for the detailed checklist of backend, database, workflow, security, testing, and deployment work required to make the prototype fully functional.
-
-## Recommended User Roles
-
-- Student: report hazards and track personal reports.
-- Staff: report hazards and receive campus alerts.
-- EHS Officer: manage assigned incidents and submit resolutions.
-- EHS Supervisor: assign officers, approve closures, and publish alerts.
-- Administrator: manage users, categories, locations, and system settings.
-- Management: review analytics and audit reports.
-
-## Documentation
-
-Additional project documentation:
-
-- `TECHNICAL_DESIGN_DOCUMENT.md`: full technical design document.
-- `FULL_FUNCTIONALITY_ROADMAP.md`: implementation checklist for full production functionality.
-- `Okechukwu_Christian_Seminar.md`: original academic/project brief.
-- `UI_DESIGN/DESIGN.md`: design system reference.
+All tables inside the [supabase_schema.sql](file:///c:/Users/U%20S%20E%20R/Drips/Devfoma/Final/Christian/Environmental_health/supabase_schema.sql) schema enforce Row Level Security:
+- **Profiles:** Users can only modify their own profiles.
+- **Incident Reporting:** Anyone can view active reports or file a new concern. Only administrators, supervisors, and officers can edit assignments or update resolution parameters.
+- **Alerts:** Only supervisors or administrators can insert safety notifications.

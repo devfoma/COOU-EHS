@@ -18,8 +18,9 @@ import {
   Flame,
   Home,
   LayoutDashboard,
+  LogIn,
+  Mail,
   MapPin,
-  Menu,
   Plus,
   Search,
   Send,
@@ -28,11 +29,14 @@ import {
   Siren,
   Sparkles,
   UserCircle,
+  UserPlus,
   Users,
   Wrench,
+  X,
   Zap
 } from 'lucide-react';
 import './styles.css';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 const BRAND_NAME = 'COUU-EHS';
 const LOGO_URL = new URL('../ASSETS/COOU-EHS LOGO MARK.png', import.meta.url).href;
@@ -88,8 +92,94 @@ const defaultMobileViewByRole = {
   management: 'alerts'
 };
 
+const selfServiceRoles = ['student', 'staff'];
+
 function hasAccess(role, permission) {
   return roles[role]?.permissions.includes(permission) || false;
+}
+
+function getSafeRole(role) {
+  return roles[role] ? role : 'student';
+}
+
+function formatRelativeTime(value) {
+  if (!value) return 'Recently';
+
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) return 'Recently';
+
+  const diffInMinutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000));
+  if (diffInMinutes < 1) return 'Just now';
+  if (diffInMinutes < 60) return `${diffInMinutes} min ago`;
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  return diffInDays === 1 ? 'Yesterday' : `${diffInDays}d ago`;
+}
+
+function mapReportRow(row) {
+  return {
+    ...row,
+    assignedTo: row.assignedTo || row.assigned_to || 'Unassigned',
+    reporter: row.reporter || row.reporter_name || 'Campus user',
+    time: row.time || row.time_label || formatRelativeTime(row.created_at),
+    progress: Number(row.progress ?? 0)
+  };
+}
+
+function mapAlertRow(row) {
+  return {
+    ...row,
+    time: row.time || row.time_label || formatRelativeTime(row.created_at)
+  };
+}
+
+function buildAppSession(authSession, profile) {
+  const user = authSession?.user;
+  const metadata = user?.user_metadata || {};
+  const role = getSafeRole(profile?.role || metadata.role);
+
+  return {
+    userId: user.id,
+    email: user.email || '',
+    role,
+    name: profile?.name || metadata.name || user.email?.split('@')[0] || roles[role].label,
+    department: profile?.department || metadata.department || ''
+  };
+}
+
+async function loadProfileForSession(authSession) {
+  const user = authSession?.user;
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, role, name, department')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (data) return data;
+
+  const metadata = user.user_metadata || {};
+  const requestedRole = selfServiceRoles.includes(metadata.role) ? metadata.role : 'student';
+  const fallbackProfile = {
+    id: user.id,
+    name: metadata.name || user.email?.split('@')[0] || 'Campus User',
+    role: requestedRole,
+    department: metadata.department || null
+  };
+
+  const { data: createdProfile, error: createError } = await supabase
+    .from('profiles')
+    .insert([fallbackProfile])
+    .select('id, role, name, department')
+    .single();
+
+  if (createError) throw createError;
+  return createdProfile;
 }
 
 const incidents = [
@@ -179,49 +269,255 @@ const activity = [
 ];
 
 function App() {
-  const [session, setSession] = useState(null);
+  const [authSession, setAuthSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(isSupabaseConfigured);
+  const [authError, setAuthError] = useState('');
   const [desktopView, setDesktopView] = useState('command');
   const [mobileView, setMobileView] = useState('dashboard');
-  const activeIncident = incidents[0];
 
-  const metrics = useMemo(() => [
-    { label: 'Active Hazards', value: '12', trend: '+3 today', tone: 'critical', icon: Siren },
-    { label: 'Resolved Today', value: '84', trend: '+18%', tone: 'safe', icon: CheckCircle2 },
-    { label: 'Avg. Response', value: '04:12', trend: '22 min faster', tone: 'neutral', icon: Clock3 },
-    { label: 'Compliance', value: '94.8%', trend: 'Annual score', tone: 'safe', icon: ClipboardCheck }
-  ], []);
+  const [incidentsList, setIncidentsList] = useState(incidents);
+  const [alertsList, setAlertsList] = useState(alerts);
+  const [activityList, setActivityList] = useState(activity);
+  const [loading, setLoading] = useState(false);
 
-  if (!session) {
-    return <PublicGateway onLogin={(role) => setSession({ role, name: roles[role].label })} />;
+  const activeIncident = incidentsList[0] || incidents[0];
+  const appSession = useMemo(
+    () => (authSession && profile ? buildAppSession(authSession, profile) : null),
+    [authSession, profile]
+  );
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setAuthLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    async function hydrateSession(nextSession) {
+      if (!nextSession) {
+        if (!isMounted) return;
+        setAuthSession(null);
+        setProfile(null);
+        setAuthLoading(false);
+        return;
+      }
+
+      setAuthLoading(true);
+      try {
+        const loadedProfile = await loadProfileForSession(nextSession);
+        if (!isMounted) return;
+        setAuthSession(nextSession);
+        setProfile(loadedProfile);
+        setAuthError('');
+      } catch (err) {
+        console.error('Unable to load Supabase profile:', err);
+        if (!isMounted) return;
+        setAuthSession(null);
+        setProfile(null);
+        setAuthError('We could not load your dashboard profile. Please contact an administrator.');
+      } finally {
+        if (isMounted) setAuthLoading(false);
+      }
+    }
+
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (error) throw error;
+        hydrateSession(data.session);
+      })
+      .catch((err) => {
+        console.error('Unable to restore Supabase session:', err);
+        if (!isMounted) return;
+        setAuthError('We could not restore your secure session. Please sign in again.');
+        setAuthLoading(false);
+      });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      hydrateSession(nextSession);
+    });
+
+    return () => {
+      isMounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const refreshData = async () => {
+    if (!isSupabaseConfigured || !appSession) return;
+
+    setLoading(true);
+    try {
+      const { data: reportData, error: reportErr } = await supabase
+        .from('hazard_reports')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (reportErr) throw reportErr;
+      setIncidentsList((reportData || []).map(mapReportRow));
+
+      const { data: alertData, error: alertErr } = await supabase
+        .from('alerts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (alertErr) throw alertErr;
+      setAlertsList((alertData || []).map(mapAlertRow));
+
+      const { data: logData, error: logErr } = await supabase
+        .from('activity_logs')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (logErr) throw logErr;
+      setActivityList((logData || []).map(log => log.description));
+    } catch (err) {
+      console.error('Error fetching data from Supabase:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, [appSession?.userId]);
+
+  const handleLogout = async () => {
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      }
+    } catch (err) {
+      console.error('Error signing out:', err);
+    } finally {
+      setAuthSession(null);
+      setProfile(null);
+      setIncidentsList(incidents);
+      setAlertsList(alerts);
+      setActivityList(activity);
+    }
+  };
+
+  const metrics = useMemo(() => {
+    const activeCount = incidentsList.filter(i => i.status !== 'Resolved' && i.status !== 'Closed').length;
+    const resolvedCount = incidentsList.filter(i => i.status === 'Resolved' || i.status === 'Closed').length;
+    return [
+      { label: 'Active Hazards', value: String(activeCount), trend: '+3 today', tone: 'critical', icon: Siren },
+      { label: 'Resolved Today', value: String(resolvedCount), trend: '+18%', tone: 'safe', icon: CheckCircle2 },
+      { label: 'Avg. Response', value: '04:12', trend: '22 min faster', tone: 'neutral', icon: Clock3 },
+      { label: 'Compliance', value: '94.8%', trend: 'Annual score', tone: 'safe', icon: ClipboardCheck }
+    ];
+  }, [incidentsList]);
+
+  if (!appSession) {
+    return <PublicGateway authLoading={authLoading} authError={authError} />;
   }
 
   return (
     <main className="app-shell">
+      {loading && <div className="loading-banner">Loading real-time campus safety data...</div>}
       <DesktopApp
         view={desktopView}
         setView={setDesktopView}
         metrics={metrics}
         activeIncident={activeIncident}
-        session={session}
-        onLogout={() => setSession(null)}
+        session={appSession}
+        onLogout={handleLogout}
+        incidentsList={incidentsList}
+        alertsList={alertsList}
+        activityList={activityList}
+        refreshData={refreshData}
       />
       <MobileApp
         view={mobileView}
         setView={setMobileView}
         activeIncident={activeIncident}
-        session={session}
-        onLogout={() => setSession(null)}
+        session={appSession}
+        onLogout={handleLogout}
+        incidentsList={incidentsList}
+        alertsList={alertsList}
+        activityList={activityList}
+        refreshData={refreshData}
       />
     </main>
   );
 }
 
-function PublicGateway({ onLogin }) {
+function PublicGateway({ authLoading, authError }) {
+  const [authModal, setAuthModal] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [department, setDepartment] = useState('');
+  const [role, setRole] = useState('student');
+  const [submitting, setSubmitting] = useState(false);
+  const [formMessage, setFormMessage] = useState('');
+  const [formError, setFormError] = useState('');
+
+  const isSignUp = authModal === 'signUp';
+
+  const openAuthModal = (nextMode) => {
+    setAuthModal(nextMode);
+    setFormError('');
+    setFormMessage('');
+  };
+
+  const closeAuthModal = () => {
+    setAuthModal(null);
+    setFormError('');
+    setFormMessage('');
+  };
+
+  const handleAuthSubmit = async (event) => {
+    event.preventDefault();
+    setFormError('');
+    setFormMessage('');
+
+    if (!isSupabaseConfigured) {
+      setFormError('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to continue.');
+      return;
+    }
+
+    if (!email || !password || (isSignUp && !name)) {
+      setFormError('Please complete the required fields.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              department,
+              role
+            }
+          }
+        });
+        if (error) throw error;
+
+        if (!data.session) {
+          setFormMessage('Account created. Check your email to confirm access before signing in.');
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      }
+    } catch (err) {
+      setFormError(err.message || 'Authentication failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <main className="public-shell">
       <header className="public-header">
         <Brand />
-        <span className="public-status">Campus safety portal</span>
+        <span className="public-status">{authLoading ? 'Checking session' : 'Secure campus portal'}</span>
       </header>
 
       <section className="public-hero">
@@ -232,49 +528,221 @@ function PublicGateway({ onLogin }) {
             COUU-EHS helps students, staff, and safety officers report hazards, coordinate response,
             publish alerts, and keep campus facilities safer for learning and work.
           </p>
+          <div className="landing-actions">
+            <button className="primary-button" type="button" onClick={() => openAuthModal('signIn')}>
+              <LogIn size={18} /> Sign In
+            </button>
+            <button className="secondary-button" type="button" onClick={() => openAuthModal('signUp')}>
+              <UserPlus size={18} /> Create Account
+            </button>
+          </div>
         </div>
         <div className="public-card glass-panel">
           <ShieldCheck size={32} />
-          <h2>Built for campus response</h2>
-          <p>Submit reports, track progress, receive alerts, and support accountable EHS operations across COOU.</p>
+          <h2>What you can do here</h2>
+          <p>Report unsafe conditions, follow response updates, and receive important campus safety notices from one secure dashboard.</p>
         </div>
       </section>
 
       <section className="public-grid">
         <article className="glass-panel public-info-card">
-          <h2>For students and staff</h2>
+          <h2>What to report</h2>
           <ul>
-            <li>Report hazards from mobile or desktop.</li>
-            <li>Add location, category, severity, and evidence.</li>
-            <li>Track the progress of submitted incidents.</li>
+            <li>Waste buildup, sanitation issues, and blocked drainage.</li>
+            <li>Faulty lighting, damaged railings, unsafe buildings, or exposed wiring.</li>
+            <li>Laboratory spills, fire risks, blocked exits, and urgent safety concerns.</li>
           </ul>
         </article>
         <article className="glass-panel public-info-card restricted">
-          <h2>For EHS teams</h2>
+          <h2>Before you submit</h2>
           <ul>
-            <li>Review active incident feeds and assignments.</li>
-            <li>Document response timelines and resolutions.</li>
-            <li>Monitor safety trends, audits, and compliance.</li>
+            <li>Give the exact location, including building, floor, room, or landmark.</li>
+            <li>Add a clear photo when it is safe to do so.</li>
+            <li>Choose the closest severity level so the response team can prioritize.</li>
+          </ul>
+        </article>
+        <article className="glass-panel public-info-card">
+          <h2>After reporting</h2>
+          <ul>
+            <li>Your report receives a tracking record.</li>
+            <li>An EHS officer or unit reviews and updates the response status.</li>
+            <li>You can return to your dashboard to check progress and alerts.</li>
+          </ul>
+        </article>
+        <article className="glass-panel public-info-card">
+          <h2>If it is urgent</h2>
+          <ul>
+            <li>Move away from immediate danger first.</li>
+            <li>Warn nearby students or staff where safe.</li>
+            <li>Use campus emergency channels for life-threatening situations.</li>
           </ul>
         </article>
       </section>
 
       <section className="role-login glass-panel">
         <div>
-          <p className="eyebrow">Access workspace</p>
-          <h2>Continue as a campus user</h2>
-          <p>Select a role to preview the workspace and workflows available to each COUU-EHS user type.</p>
+          <p className="eyebrow">Get started</p>
+          <h2>Access your campus safety dashboard</h2>
+          <p>Use your account to submit reports, monitor updates, and receive safety alerts relevant to your role.</p>
+        </div>
+        <div className="auth-cta-group">
+          <button className="primary-button" type="button" onClick={() => openAuthModal('signIn')}>
+            <LogIn size={18} /> Sign In
+          </button>
+          <button className="ghost-button" type="button" onClick={() => openAuthModal('signUp')}>
+            <UserPlus size={18} /> Create Account
+          </button>
+          {authError && <p className="auth-error">{authError}</p>}
+        </div>
+      </section>
+
+      <section className="role-login dashboard-routes glass-panel">
+        <div>
+          <p className="eyebrow">Who uses COUU-EHS</p>
+          <h2>Different dashboards for different safety work</h2>
+          <p>Students and staff focus on reporting and updates. EHS teams handle review, response, alerts, and compliance follow-up.</p>
         </div>
         <div className="role-grid">
           {Object.entries(roles).map(([role, config]) => (
-            <button key={role} className="role-card" type="button" onClick={() => onLogin(role)}>
+            <article key={role} className="role-card static">
               <strong>{config.label}</strong>
               <span>{config.description}</span>
-            </button>
+            </article>
           ))}
         </div>
       </section>
+
+      {authModal && (
+        <AuthModal
+          mode={authModal}
+          setMode={setAuthModal}
+          closeAuthModal={closeAuthModal}
+          handleAuthSubmit={handleAuthSubmit}
+          submitting={submitting}
+          authLoading={authLoading}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          name={name}
+          setName={setName}
+          department={department}
+          setDepartment={setDepartment}
+          role={role}
+          setRole={setRole}
+          formError={formError}
+          authError={authError}
+          formMessage={formMessage}
+        />
+      )}
     </main>
+  );
+}
+
+function AuthModal({
+  mode,
+  setMode,
+  closeAuthModal,
+  handleAuthSubmit,
+  submitting,
+  authLoading,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  name,
+  setName,
+  department,
+  setDepartment,
+  role,
+  setRole,
+  formError,
+  authError,
+  formMessage
+}) {
+  const isSignUp = mode === 'signUp';
+
+  return (
+    <div className="modal-backdrop" role="presentation" onMouseDown={closeAuthModal}>
+      <section className="modal-card auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+        <header className="modal-header">
+          <div>
+            <p className="eyebrow">Secure access</p>
+            <h2 id="auth-modal-title">{isSignUp ? 'Create your COUU-EHS account' : 'Sign in to COUU-EHS'}</h2>
+          </div>
+          <button className="icon-button" type="button" aria-label="Close authentication modal" onClick={closeAuthModal}>
+            <X size={18} />
+          </button>
+        </header>
+
+        <form className="auth-form" onSubmit={handleAuthSubmit}>
+          <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
+            <button className={!isSignUp ? 'active' : ''} type="button" onClick={() => setMode('signIn')}>
+              <LogIn size={16} /> Sign in
+            </button>
+            <button className={isSignUp ? 'active' : ''} type="button" onClick={() => setMode('signUp')}>
+              <UserPlus size={16} /> Create account
+            </button>
+          </div>
+
+          {isSignUp && (
+            <div className="form-grid">
+              <label>
+                <FieldLabel label="Full Name *" />
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" required />
+              </label>
+              <label>
+                <FieldLabel label="Department" />
+                <input value={department} onChange={(e) => setDepartment(e.target.value)} placeholder="Faculty / unit" />
+              </label>
+              <label>
+                <FieldLabel label="Account Type" />
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                  {selfServiceRoles.map((roleId) => (
+                    <option key={roleId} value={roleId}>{roles[roleId].label}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+
+          <label>
+            <FieldLabel label="Email Address *" />
+            <div className="input-with-icon">
+              <Mail size={16} />
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@coou.edu.ng"
+                type="email"
+                autoComplete="email"
+                required
+              />
+            </div>
+          </label>
+          <label>
+            <FieldLabel label="Password *" />
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Your secure password"
+              type="password"
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
+              minLength="6"
+              required
+            />
+          </label>
+
+          {(formError || authError) && <p className="auth-error">{formError || authError}</p>}
+          {formMessage && <p className="auth-message">{formMessage}</p>}
+
+          <button className="primary-button" type="submit" disabled={submitting || authLoading}>
+            {isSignUp ? <UserPlus size={18} /> : <LogIn size={18} />}
+            {submitting || authLoading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
+          </button>
+        </form>
+      </section>
+    </div>
   );
 }
 
@@ -291,8 +759,9 @@ function Brand({ compact = false }) {
   );
 }
 
-function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout }) {
+function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout, incidentsList, alertsList, activityList, refreshData }) {
   const role = session.role;
+  const [profileOpen, setProfileOpen] = useState(false);
   const desktopViews = [
     { id: 'command', label: 'Dashboard', icon: LayoutDashboard, permission: 'incident:assigned' },
     { id: 'report', label: 'Hazard Reports', icon: AlertTriangle, permission: 'report:create' },
@@ -337,15 +806,16 @@ function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout 
             </label>
             <AccessBadge role={role} />
             <button className="icon-button" aria-label="Notifications"><Bell size={20} /></button>
-            <button className="icon-button" aria-label="Sign out" onClick={onLogout}><UserCircle size={20} /></button>
+            <button className="icon-button" aria-label="Open profile" onClick={() => setProfileOpen(true)}><UserCircle size={20} /></button>
           </div>
         </header>
 
-        {activeView === 'command' && <Protected permission="incident:assigned" role={role} fallbackPermission="incident:all"><CommandCenter metrics={metrics} role={role} /></Protected>}
-        {activeView === 'report' && <Protected permission="report:create" role={role}><ReportHazard role={role} /></Protected>}
-        {activeView === 'timeline' && <Protected permission="incident:resolve" role={role}><IncidentTimeline incident={activeIncident} role={role} /></Protected>}
+        {activeView === 'command' && <Protected permission="incident:assigned" role={role} fallbackPermission="incident:all"><CommandCenter metrics={metrics} role={role} incidentsList={incidentsList} /></Protected>}
+        {activeView === 'report' && <Protected permission="report:create" role={role}><ReportHazard session={session} activityList={activityList} refreshData={refreshData} /></Protected>}
+        {activeView === 'timeline' && <Protected permission="incident:resolve" role={role}><IncidentTimeline incident={activeIncident} role={role} refreshData={refreshData} /></Protected>}
         {activeView === 'analytics' && <Protected permission="analytics:view" role={role}><Analytics metrics={metrics} role={role} /></Protected>}
       </div>
+      {profileOpen && <ProfileModal session={session} onClose={() => setProfileOpen(false)} onLogout={onLogout} />}
     </section>
   );
 }
@@ -389,7 +859,7 @@ function NavButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-function CommandCenter({ metrics }) {
+function CommandCenter({ metrics, incidentsList }) {
   return (
     <div className="screen desktop-grid">
       <section className="page-heading">
@@ -435,7 +905,7 @@ function CommandCenter({ metrics }) {
           </div>
         </div>
         <div className="incident-grid">
-          {incidents.slice(0, 3).map((incident) => <IncidentCard key={incident.id} incident={incident} />)}
+          {incidentsList.slice(0, 8).map((incident) => <IncidentCard key={incident.id} incident={incident} />)}
         </div>
       </section>
 
@@ -521,7 +991,74 @@ function Protocols() {
   );
 }
 
-function ReportHazard() {
+function ReportHazard({ session, activityList, refreshData }) {
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Infrastructure');
+  const [location, setLocation] = useState('');
+  const [reporter, setReporter] = useState(session?.name || '');
+  const [severity, setSeverity] = useState('high');
+  const [description, setDescription] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setReporter(session?.name || '');
+  }, [session?.name]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!title || !location || !reporter || !description) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    setSubmitting(true);
+    const reportId = `HAZ-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newReport = {
+      id: reportId,
+      title,
+      category,
+      location,
+      reporter_name: reporter,
+      reporter_id: session?.userId,
+      severity,
+      description,
+      status: 'Reported',
+      progress: 10
+    };
+
+    try {
+      if (isSupabaseConfigured) {
+        // Insert report
+        const { error: insertErr } = await supabase
+          .from('hazard_reports')
+          .insert([newReport]);
+
+        if (insertErr) throw insertErr;
+
+        // Insert log
+        await supabase
+          .from('activity_logs')
+          .insert([{ description: `New hazard report ${reportId} submitted by ${reporter}.` }]);
+
+        if (refreshData) await refreshData();
+        alert(`Report ${reportId} submitted successfully.`);
+      } else {
+        alert(`Supabase is not configured. (Mock) Submitted Report ${reportId}!`);
+      }
+
+      // Reset form
+      setTitle('');
+      setLocation('');
+      setReporter('');
+      setDescription('');
+    } catch (err) {
+      console.error(err);
+      alert('Error submitting report: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="screen report-layout">
       <section className="page-heading full">
@@ -532,30 +1069,44 @@ function ReportHazard() {
         </div>
       </section>
 
-      <form className="glass-panel hazard-form">
+      <form className="glass-panel hazard-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <label>
-            <FieldLabel label="Hazard Title" />
-            <input placeholder="e.g. Chemical spill in Lab 4B" />
+            <FieldLabel label="Hazard Title *" />
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Chemical spill in Lab 4B"
+              required
+            />
           </label>
           <label>
-            <FieldLabel label="Category" />
-            <select>
-              <option>Select hazard type</option>
-              <option>Waste Management</option>
-              <option>Infrastructure</option>
-              <option>Fire Safety</option>
-              <option>Electrical Hazard</option>
-              <option>Biological Risk</option>
+            <FieldLabel label="Category *" />
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="Laboratory">Laboratory</option>
+              <option value="Infrastructure">Infrastructure</option>
+              <option value="Waste Management">Waste Management</option>
+              <option value="Electrical">Electrical Hazard</option>
+              <option value="Biological">Biological Risk</option>
             </select>
           </label>
           <label>
-            <FieldLabel label="Exact Location" />
-            <input placeholder="Room / floor / building" />
+            <FieldLabel label="Exact Location *" />
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Room / floor / building"
+              required
+            />
           </label>
           <label>
-            <FieldLabel label="Reporter" />
-            <input placeholder="Your name or department" />
+            <FieldLabel label="Reporter Name *" />
+            <input
+              value={reporter}
+              onChange={(e) => setReporter(e.target.value)}
+              placeholder="Your name or department"
+              required
+            />
           </label>
         </div>
 
@@ -568,40 +1119,95 @@ function ReportHazard() {
 
         <FieldLabel label="Severity Level" />
         <div className="severity-selector">
-          <button type="button"><SeverityChip severity="low" label="Low" /></button>
-          <button type="button"><SeverityChip severity="medium" label="Medium" /></button>
-          <button type="button" className="selected"><SeverityChip severity="high" label="High" /></button>
-          <button type="button"><SeverityChip severity="critical" label="Critical" /></button>
+          {['low', 'medium', 'high', 'critical'].map((s) => (
+            <button
+              key={s}
+              type="button"
+              className={severity === s ? 'selected' : ''}
+              onClick={() => setSeverity(s)}
+            >
+              <SeverityChip severity={s} label={s.toUpperCase()} />
+            </button>
+          ))}
         </div>
 
         <label>
-          <FieldLabel label="Detailed Description" />
-          <textarea rows="5" placeholder="Describe the hazard, immediate dangers, and any actions already taken." />
+          <FieldLabel label="Detailed Description *" />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows="5"
+            placeholder="Describe the hazard, immediate dangers, and any actions already taken."
+            required
+          />
         </label>
 
         <div className="form-actions">
-          <button className="primary-button" type="button"><Send size={18} /> Submit Hazard Report</button>
+          <button className="primary-button" type="submit" disabled={submitting}>
+            <Send size={18} /> {submitting ? 'Submitting...' : 'Submit Hazard Report'}
+          </button>
           <button className="ghost-button" type="button">Save Draft</button>
         </div>
       </form>
 
       <aside className="glass-panel activity-panel">
         <h2>Recent Activity</h2>
-        {activity.map((item) => (
-          <p key={item}><Sparkles size={15} />{item}</p>
+        {(activityList || []).map((item, idx) => (
+          <p key={idx}><Sparkles size={15} />{item}</p>
         ))}
       </aside>
     </div>
   );
 }
 
-function IncidentTimeline({ incident }) {
+function IncidentTimeline({ incident, refreshData }) {
+  const [summary, setSummary] = useState('');
+  const [airQuality, setAirQuality] = useState('');
+  const [surfacePh, setSurfacePh] = useState('');
+  const [signoff, setSignoff] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const steps = [
     { title: 'Hazard Submitted', text: 'Initial report submitted with location and photo evidence.', done: true },
-    { title: 'Assigned to EHS Unit', text: 'Science safety officer assigned for on-site review.', done: true },
-    { title: 'In Progress: On-Site Assessment', text: 'Containment team verifying spill boundary and ventilation.', done: true },
-    { title: 'Resolution Pending', text: 'Awaiting final safety measurements and supervisor signoff.', done: false }
+    { title: 'Assigned to EHS Unit', text: `Science safety officer assigned for on-site review. Status: ${incident.status}`, done: true },
+    { title: 'In Progress: On-Site Assessment', text: 'Containment team verifying spill boundary and ventilation.', done: incident.status !== 'Reported' },
+    { title: 'Resolved', text: 'Safety checks complete and confirmed.', done: incident.status === 'Resolved' }
   ];
+
+  const handleResolve = async () => {
+    if (!signoff) {
+      alert('Please confirm safety checks are complete by checking the signoff box.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      if (isSupabaseConfigured) {
+        // Update report status
+        const { error: updateErr } = await supabase
+          .from('hazard_reports')
+          .update({ status: 'Resolved', progress: 100 })
+          .eq('id', incident.id);
+
+        if (updateErr) throw updateErr;
+
+        // Insert log
+        await supabase
+          .from('activity_logs')
+          .insert([{ description: `Incident ${incident.id} resolved. Air: ${airQuality || 'N/A'}, pH: ${surfacePh || 'N/A'}.` }]);
+
+        if (refreshData) await refreshData();
+        alert(`Incident ${incident.id} status updated to Resolved!`);
+      } else {
+        alert(`Supabase is not configured. (Mock) Resolved incident ${incident.id}!`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to resolve incident: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="screen timeline-layout">
@@ -633,16 +1239,29 @@ function IncidentTimeline({ incident }) {
         <h2>Resolution Form</h2>
         <label>
           <FieldLabel label="Final Disposition Summary" />
-          <textarea rows="4" placeholder="Describe final actions taken..." />
+          <textarea
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            rows="4"
+            placeholder="Describe final actions taken..."
+          />
         </label>
         <div className="form-grid single">
           <label>
             <FieldLabel label="Air Quality (PPM)" />
-            <input placeholder="0.04" />
+            <input
+              value={airQuality}
+              onChange={(e) => setAirQuality(e.target.value)}
+              placeholder="0.04"
+            />
           </label>
           <label>
             <FieldLabel label="Surface PH" />
-            <input placeholder="7.0 neutral" />
+            <input
+              value={surfacePh}
+              onChange={(e) => setSurfacePh(e.target.value)}
+              placeholder="7.0 neutral"
+            />
           </label>
         </div>
         <div className="upload-zone compact">
@@ -650,10 +1269,21 @@ function IncidentTimeline({ incident }) {
           <strong>Upload post-cleanup proof</strong>
         </div>
         <label className="signoff">
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            checked={signoff}
+            onChange={(e) => setSignoff(e.target.checked)}
+          />
           I confirm safety checks are complete and the location is ready for verification.
         </label>
-        <button className="primary-button" type="button"><CheckCircle2 size={18} /> Submit Resolution</button>
+        <button
+          className="primary-button"
+          type="button"
+          onClick={handleResolve}
+          disabled={submitting}
+        >
+          <CheckCircle2 size={18} /> {submitting ? 'Resolving...' : 'Submit Resolution'}
+        </button>
       </aside>
     </div>
   );
@@ -701,8 +1331,9 @@ function Analytics({ metrics }) {
   );
 }
 
-function MobileApp({ view, setView, activeIncident, session, onLogout }) {
+function MobileApp({ view, setView, activeIncident, session, onLogout, incidentsList, alertsList, activityList, refreshData }) {
   const role = session.role;
+  const [profileOpen, setProfileOpen] = useState(false);
   const mobileViews = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, permission: 'report:own' },
     { id: 'report', label: 'Report', icon: Plus, permission: 'report:create' },
@@ -724,19 +1355,20 @@ function MobileApp({ view, setView, activeIncident, session, onLogout }) {
       <header className="mobile-header">
         <Brand />
         <AccessBadge role={role} />
-        <button className="icon-button" aria-label="Sign out" onClick={onLogout}><Menu size={20} /></button>
+        <button className="icon-button" aria-label="Open profile" onClick={() => setProfileOpen(true)}><UserCircle size={20} /></button>
       </header>
 
-      {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard /></Protected>}
-      {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport /></Protected>}
+      {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard incidentsList={incidentsList} activityList={activityList} /></Protected>}
+      {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport session={session} refreshData={refreshData} /></Protected>}
       {activeView === 'tracker' && <Protected role={role} permission="report:own" fallbackPermission="incident:resolve"><MobileTracker incident={activeIncident} /></Protected>}
-      {activeView === 'alerts' && <Protected role={role} permission="alerts:view" fallbackPermission="alerts:manage"><MobileAlerts role={role} /></Protected>}
+      {activeView === 'alerts' && <Protected role={role} permission="alerts:view" fallbackPermission="alerts:manage"><MobileAlerts role={role} alertsList={alertsList} /></Protected>}
 
       <nav className="mobile-nav">
         {mobileViews.map((item) => (
           <MobileNavButton key={item.id} icon={item.icon} label={item.label} active={activeView === item.id} onClick={() => setView(item.id)} />
         ))}
       </nav>
+      {profileOpen && <ProfileModal session={session} onClose={() => setProfileOpen(false)} onLogout={onLogout} />}
     </section>
   );
 }
@@ -750,7 +1382,10 @@ function MobileNavButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-function MobileDashboard() {
+function MobileDashboard({ incidentsList, activityList }) {
+  const totalReports = incidentsList.length;
+  const resolvedReports = incidentsList.filter(i => i.status === 'Resolved').length;
+
   return (
     <div className="mobile-screen">
       <section className="mobile-hero">
@@ -758,40 +1393,123 @@ function MobileDashboard() {
         <h1>Campus Dashboard</h1>
       </section>
       <div className="mobile-metrics">
-        <MetricMini value="18" label="Total Reports" />
-        <MetricMini value="12" label="Resolved Cases" />
+        <MetricMini value={String(totalReports)} label="Total Reports" />
+        <MetricMini value={String(resolvedReports)} label="Resolved Cases" />
       </div>
       <div className="section-title">
         <h2>Active Reports</h2>
         <button>View All</button>
       </div>
-      {incidents.slice(1, 4).map((incident) => <MobileReportCard key={incident.id} incident={incident} />)}
+      {(incidentsList || []).slice(0, 4).map((incident) => <MobileReportCard key={incident.id} incident={incident} />)}
       <div className="section-title">
         <h2>Recent Activity</h2>
       </div>
       <div className="mobile-activity glass-panel">
-        {activity.slice(0, 3).map((item) => <p key={item}>{item}</p>)}
+        {(activityList || []).slice(0, 3).map((item, idx) => <p key={idx}>{item}</p>)}
       </div>
     </div>
   );
 }
 
-function MobileReport() {
+function MobileReport({ session, refreshData }) {
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Electrical');
+  const [location, setLocation] = useState('');
+  const [severity, setSeverity] = useState('high');
+  const [description, setDescription] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!title || !location || !description) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    setSubmitting(true);
+    const reportId = `HAZ-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newReport = {
+      id: reportId,
+      title,
+      category,
+      location,
+      reporter_name: session?.name || 'Mobile App User',
+      reporter_id: session?.userId,
+      severity,
+      description,
+      status: 'Reported',
+      progress: 10
+    };
+
+    try {
+      if (isSupabaseConfigured) {
+        const { error: insertErr } = await supabase
+          .from('hazard_reports')
+          .insert([newReport]);
+
+        if (insertErr) throw insertErr;
+
+        await supabase
+          .from('activity_logs')
+          .insert([{ description: `Mobile report ${reportId} submitted at ${location}.` }]);
+
+        if (refreshData) await refreshData();
+        alert(`Mobile report ${reportId} submitted successfully!`);
+      } else {
+        alert(`Supabase not configured. (Mock) Submitted ${reportId}!`);
+      }
+
+      setTitle('');
+      setLocation('');
+      setDescription('');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to submit mobile report: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">Fast field report</p>
         <h1>Report Hazard</h1>
       </section>
+
+      <label style={{ display: 'block', marginBottom: '10px' }}>
+        <FieldLabel label="Report Title *" />
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Brief title (e.g. Broken steps)"
+          required
+        />
+      </label>
+
       <div className="category-grid">
-        <CategoryButton icon={Zap} label="Electrical" active />
-        <CategoryButton icon={Wrench} label="Facility" />
-        <CategoryButton icon={Flame} label="Fire" />
-        <CategoryButton icon={Activity} label="Bio Risk" />
+        {[
+          { key: 'Electrical', icon: Zap },
+          { key: 'Facility', icon: Wrench },
+          { key: 'Fire', icon: Flame },
+          { key: 'Laboratory', icon: Activity }
+        ].map((item) => (
+          <CategoryButton
+            key={item.key}
+            icon={item.icon}
+            label={item.key}
+            active={category === item.key}
+            onClick={() => setCategory(item.key)}
+          />
+        ))}
       </div>
       <label>
-        <FieldLabel label="Location" />
-        <input placeholder="Scanning current coordinates..." />
+        <FieldLabel label="Location *" />
+        <input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Building / Room number"
+          required
+        />
       </label>
       <div className="upload-zone compact">
         <Camera size={24} />
@@ -799,16 +1517,35 @@ function MobileReport() {
       </div>
       <FieldLabel label="Risk Level" />
       <div className="mobile-risk">
-        <button>Low</button>
-        <button>Med</button>
-        <button className="active">High</button>
-        <button>Crit</button>
+        {['low', 'medium', 'high', 'critical'].map((r) => (
+          <button
+            key={r}
+            className={severity === r ? 'active' : ''}
+            onClick={() => setSeverity(r)}
+            type="button"
+          >
+            {r.substring(0, 4).toUpperCase()}
+          </button>
+        ))}
       </div>
       <label>
-        <FieldLabel label="Incident Details" />
-        <textarea rows="4" placeholder="Describe the hazard and immediate dangers..." />
+        <FieldLabel label="Incident Details *" />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows="4"
+          placeholder="Describe the hazard and immediate dangers..."
+          required
+        />
       </label>
-      <button className="primary-button mobile-submit" type="button"><Send size={18} /> Submit Hazard Report</button>
+      <button
+        className="primary-button mobile-submit"
+        type="button"
+        onClick={handleSubmit}
+        disabled={submitting}
+      >
+        <Send size={18} /> {submitting ? 'Submitting...' : 'Submit Hazard Report'}
+      </button>
     </div>
   );
 }
@@ -823,7 +1560,7 @@ function MobileTracker({ incident }) {
       <article className="glass-panel tracker-card">
         <div>
           <span>Risk</span>
-          <strong>High Risk</strong>
+          <strong>{incident.severity.toUpperCase()} Risk</strong>
         </div>
         <div>
           <span>Category</span>
@@ -832,12 +1569,19 @@ function MobileTracker({ incident }) {
       </article>
       <section className="glass-panel mini-timeline">
         <h2>Resolution Progress</h2>
-        {['Reported', 'Assigned', 'In Progress', 'Resolved'].map((step, index) => (
-          <div key={step} className={index < 3 ? 'done' : ''}>
-            <span />
-            <p>{step}</p>
-          </div>
-        ))}
+        {['Reported', 'Assigned', 'In Progress', 'Resolved'].map((step, index) => {
+          const isDone =
+            (step === 'Reported') ||
+            (step === 'Assigned' && incident.status !== 'Reported') ||
+            (step === 'In Progress' && incident.status !== 'Reported' && incident.status !== 'Assigned') ||
+            (step === 'Resolved' && incident.status === 'Resolved');
+          return (
+            <div key={step} className={isDone ? 'done' : ''}>
+              <span />
+              <p>{step}</p>
+            </div>
+          );
+        })}
       </section>
       <button className="primary-button mobile-submit" type="button"><Bell size={18} /> Notify Me on Updates</button>
       <button className="ghost-button mobile-submit" type="button">Share Report</button>
@@ -845,20 +1589,20 @@ function MobileTracker({ incident }) {
   );
 }
 
-function MobileAlerts() {
+function MobileAlerts({ role, alertsList }) {
   return (
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">Live campus notices</p>
         <h1>Campus Alerts</h1>
       </section>
-      {alerts.map((alert) => (
-        <article key={alert.title} className={`mobile-alert glass-panel ${alert.severity}`}>
+      {(alertsList || []).map((alert) => (
+        <article key={alert.id || alert.title} className={`mobile-alert glass-panel ${alert.severity}`}>
           <SeverityChip severity={alert.severity} />
           <h2>{alert.title}</h2>
           <p>{alert.body}</p>
           <span><MapPin size={15} />{alert.location}</span>
-          <small>{alert.time}</small>
+          <small>{alert.time_label || alert.time}</small>
         </article>
       ))}
       <section className="assist-card">
@@ -894,12 +1638,53 @@ function MobileReportCard({ incident }) {
   );
 }
 
-function CategoryButton({ icon: Icon, label, active }) {
+function CategoryButton({ icon: Icon, label, active, onClick }) {
   return (
-    <button className={`category-button ${active ? 'active' : ''}`} type="button">
+    <button className={`category-button ${active ? 'active' : ''}`} type="button" onClick={onClick}>
       <Icon size={22} />
       <span>{label}</span>
     </button>
+  );
+}
+
+function ProfileModal({ session, onClose, onLogout }) {
+  const roleConfig = roles[session.role] || roles.student;
+
+  return (
+    <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
+      <section className="modal-card profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+        <header className="modal-header">
+          <div>
+            <p className="eyebrow">Account profile</p>
+            <h2 id="profile-modal-title">{session.name || roleConfig.label}</h2>
+          </div>
+          <button className="icon-button" type="button" aria-label="Close profile modal" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </header>
+
+        <div className="profile-summary">
+          <div className="profile-avatar"><UserCircle size={38} /></div>
+          <div>
+            <strong>{roleConfig.label}</strong>
+            <span>{session.email}</span>
+            {session.department && <span>{session.department}</span>}
+          </div>
+        </div>
+
+        <div className="profile-access-list">
+          <h3>Workspace access</h3>
+          {roleConfig.permissions.map((permission) => (
+            <span key={permission}><ShieldCheck size={14} />{permission.replace(':', ' ')}</span>
+          ))}
+        </div>
+
+        <div className="modal-actions">
+          <button className="ghost-button" type="button" onClick={onClose}>Close</button>
+          <button className="secondary-button" type="button" onClick={onLogout}>Sign Out</button>
+        </div>
+      </section>
+    </div>
   );
 }
 
