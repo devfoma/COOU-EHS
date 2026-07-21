@@ -75,8 +75,8 @@ const roles = {
 };
 
 const defaultDesktopViewByRole = {
-  student: 'report',
-  staff: 'report',
+  student: 'myReports',
+  staff: 'myReports',
   officer: 'command',
   supervisor: 'command',
   admin: 'command',
@@ -792,6 +792,7 @@ function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout,
   const [profileOpen, setProfileOpen] = useState(false);
   const desktopViews = [
     { id: 'command', label: 'Dashboard', icon: LayoutDashboard, permission: 'incident:assigned' },
+    { id: 'myReports', label: 'My Reports', icon: FileText, permission: 'report:own' },
     { id: 'report', label: 'Hazard Reports', icon: AlertTriangle, permission: 'report:create' },
     { id: 'timeline', label: 'Incident Timeline', icon: FileText, permission: 'incident:resolve' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, permission: 'analytics:view' }
@@ -841,6 +842,7 @@ function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout,
         </header>
 
         {activeView === 'command' && <Protected permission="incident:assigned" role={role} fallbackPermission="incident:all"><CommandCenter metrics={metrics} role={role} incidentsList={incidentsList} /></Protected>}
+        {activeView === 'myReports' && <Protected permission="report:own" role={role}><MyReports reports={incidentsList} role={role} /></Protected>}
         {activeView === 'report' && <Protected permission="report:create" role={role}><ReportHazard session={session} activityList={activityList} refreshData={refreshData} onReportCreated={onReportCreated} /></Protected>}
         {activeView === 'timeline' && <Protected permission="incident:resolve" role={role}><IncidentTimeline incident={activeIncident} role={role} refreshData={refreshData} /></Protected>}
         {activeView === 'analytics' && <Protected permission="analytics:view" role={role}><Analytics metrics={metrics} role={role} /></Protected>}
@@ -1368,8 +1370,9 @@ function MobileApp({ view, setView, activeIncident, session, onLogout, incidents
   const [profileOpen, setProfileOpen] = useState(false);
   const mobileViews = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, permission: 'report:own' },
+    { id: 'myReports', label: 'My Reports', icon: FileText, permission: 'report:own' },
     { id: 'report', label: 'Report', icon: Plus, permission: 'report:create' },
-    { id: 'tracker', label: 'Tracker', icon: FileText, permission: 'report:own', fallbackPermission: 'incident:resolve' },
+    { id: 'tracker', label: 'Tracker', icon: ClipboardCheck, permission: 'report:own', fallbackPermission: 'incident:resolve' },
     { id: 'alerts', label: 'Alerts', icon: Bell, permission: 'alerts:view', fallbackPermission: 'alerts:manage' }
   ].filter((item) => hasAccess(role, item.permission) || (item.fallbackPermission && hasAccess(role, item.fallbackPermission)));
   const allowedViewIds = mobileViews.map((item) => item.id);
@@ -1391,6 +1394,7 @@ function MobileApp({ view, setView, activeIncident, session, onLogout, incidents
       </header>
 
       {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard incidentsList={incidentsList} activityList={activityList} role={role} /></Protected>}
+      {activeView === 'myReports' && <Protected role={role} permission="report:own"><MyReports reports={incidentsList} role={role} compact /></Protected>}
       {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport session={session} refreshData={refreshData} onReportCreated={onReportCreated} /></Protected>}
       {activeView === 'tracker' && <Protected role={role} permission="report:own" fallbackPermission="incident:resolve"><MobileTracker incident={activeIncident} /></Protected>}
       {activeView === 'alerts' && <Protected role={role} permission="alerts:view" fallbackPermission="alerts:manage"><MobileAlerts role={role} alertsList={alertsList} /></Protected>}
@@ -1418,6 +1422,7 @@ function MobileDashboard({ incidentsList, activityList, role }) {
   const ownsOnly = seesOwnReportsOnly(role);
   const totalReports = incidentsList.length;
   const resolvedReports = incidentsList.filter(i => i.status === 'Resolved').length;
+  const latestReports = (incidentsList || []).slice(0, 2);
 
   return (
     <div className="mobile-screen">
@@ -1430,11 +1435,10 @@ function MobileDashboard({ incidentsList, activityList, role }) {
         <MetricMini value={String(resolvedReports)} label="Resolved Cases" />
       </div>
       <div className="section-title">
-        <h2>{ownsOnly ? 'My Active Reports' : 'Active Reports'}</h2>
-        <button>View All</button>
+        <h2>{ownsOnly ? 'Latest Reports' : 'Active Reports'}</h2>
       </div>
-      {(incidentsList || []).length > 0 ? (
-        (incidentsList || []).slice(0, 4).map((incident) => <MobileReportCard key={incident.id} incident={incident} />)
+      {latestReports.length > 0 ? (
+        latestReports.map((incident) => <MobileReportCard key={incident.id} incident={incident} />)
       ) : (
         <div className="mobile-empty-state glass-panel">
           <FileText size={24} />
@@ -1448,6 +1452,56 @@ function MobileDashboard({ incidentsList, activityList, role }) {
       <div className="mobile-activity glass-panel">
         {(activityList || []).slice(0, 3).map((item, idx) => <p key={idx}>{item}</p>)}
       </div>
+    </div>
+  );
+}
+
+function MyReports({ reports, role, compact = false }) {
+  const ownsOnly = seesOwnReportsOnly(role);
+  const activeReports = (reports || []).filter((report) => report.status !== 'Resolved' && report.status !== 'Closed');
+  const resolvedReports = (reports || []).filter((report) => report.status === 'Resolved' || report.status === 'Closed');
+
+  return (
+    <div className={compact ? 'mobile-screen' : 'screen my-reports-screen'}>
+      <section className={compact ? 'mobile-hero' : 'page-heading full'}>
+        <div>
+          <p className="eyebrow">{ownsOnly ? 'Submitted by you' : 'Report records'}</p>
+          <h1>My Reports</h1>
+          <p>{ownsOnly ? 'Track the hazards you have submitted and follow their response status.' : 'Review submitted reports available to your role.'}</p>
+        </div>
+      </section>
+
+      <div className="my-report-summary">
+        <MetricMini value={String((reports || []).length)} label="All Reports" />
+        <MetricMini value={String(activeReports.length)} label="Active" />
+        <MetricMini value={String(resolvedReports.length)} label="Resolved" />
+      </div>
+
+      <section className="my-report-list">
+        {(reports || []).length > 0 ? (
+          (reports || []).map((report) => (
+            <article key={report.id} className="glass-panel my-report-row">
+              <div>
+                <SeverityChip severity={report.severity} />
+                <span className="report-code">{report.id}</span>
+              </div>
+              <h2>{report.title}</h2>
+              <p>{report.description}</p>
+              <div className="incident-meta">
+                <span><MapPin size={15} />{report.location}</span>
+                <span><Clock3 size={15} />{report.time}</span>
+                <span><ClipboardCheck size={15} />{report.status}</span>
+              </div>
+            </article>
+          ))
+        ) : (
+          <div className="mobile-empty-state glass-panel">
+            <FileText size={24} />
+            <h3>No reports yet</h3>
+            <p>Once you submit a hazard report, it will appear in this tab for tracking.</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
