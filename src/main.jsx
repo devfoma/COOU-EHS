@@ -102,6 +102,10 @@ function canUseOperationalSearch(role) {
   return hasAccess(role, 'incident:assigned') || hasAccess(role, 'incident:all') || hasAccess(role, 'analytics:view');
 }
 
+function seesOwnReportsOnly(role) {
+  return hasAccess(role, 'report:own') && !canUseOperationalSearch(role);
+}
+
 function getSafeRole(role) {
   return roles[role] ? role : 'student';
 }
@@ -285,11 +289,21 @@ function App() {
   const [activityList, setActivityList] = useState(activity);
   const [loading, setLoading] = useState(false);
 
-  const activeIncident = incidentsList[0] || incidents[0];
   const appSession = useMemo(
     () => (authSession && profile ? buildAppSession(authSession, profile) : null),
     [authSession, profile]
   );
+  const visibleIncidentsList = useMemo(() => {
+    if (!appSession || !seesOwnReportsOnly(appSession.role)) {
+      return incidentsList;
+    }
+
+    return incidentsList.filter((incident) => {
+      const reporterId = incident.reporter_id || incident.reporterId;
+      return reporterId === appSession.userId;
+    });
+  }, [appSession, incidentsList]);
+  const activeIncident = visibleIncidentsList[0] || incidentsList[0] || incidents[0];
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -381,6 +395,14 @@ function App() {
     }
   };
 
+  const handleReportCreated = (newReport) => {
+    const mappedReport = mapReportRow(newReport);
+    setIncidentsList((currentReports) => [
+      mappedReport,
+      ...currentReports.filter((report) => report.id !== mappedReport.id)
+    ]);
+  };
+
   useEffect(() => {
     refreshData();
   }, [appSession?.userId]);
@@ -403,15 +425,15 @@ function App() {
   };
 
   const metrics = useMemo(() => {
-    const activeCount = incidentsList.filter(i => i.status !== 'Resolved' && i.status !== 'Closed').length;
-    const resolvedCount = incidentsList.filter(i => i.status === 'Resolved' || i.status === 'Closed').length;
+    const activeCount = visibleIncidentsList.filter(i => i.status !== 'Resolved' && i.status !== 'Closed').length;
+    const resolvedCount = visibleIncidentsList.filter(i => i.status === 'Resolved' || i.status === 'Closed').length;
     return [
       { label: 'Active Hazards', value: String(activeCount), trend: '+3 today', tone: 'critical', icon: Siren },
       { label: 'Resolved Today', value: String(resolvedCount), trend: '+18%', tone: 'safe', icon: CheckCircle2 },
       { label: 'Avg. Response', value: '04:12', trend: '22 min faster', tone: 'neutral', icon: Clock3 },
       { label: 'Compliance', value: '94.8%', trend: 'Annual score', tone: 'safe', icon: ClipboardCheck }
     ];
-  }, [incidentsList]);
+  }, [visibleIncidentsList]);
 
   if (!appSession) {
     return <PublicGateway authLoading={authLoading} authError={authError} />;
@@ -427,10 +449,11 @@ function App() {
         activeIncident={activeIncident}
         session={appSession}
         onLogout={handleLogout}
-        incidentsList={incidentsList}
+        incidentsList={visibleIncidentsList}
         alertsList={alertsList}
         activityList={activityList}
         refreshData={refreshData}
+        onReportCreated={handleReportCreated}
       />
       <MobileApp
         view={mobileView}
@@ -438,10 +461,11 @@ function App() {
         activeIncident={activeIncident}
         session={appSession}
         onLogout={handleLogout}
-        incidentsList={incidentsList}
+        incidentsList={visibleIncidentsList}
         alertsList={alertsList}
         activityList={activityList}
         refreshData={refreshData}
+        onReportCreated={handleReportCreated}
       />
     </main>
   );
@@ -763,7 +787,7 @@ function Brand({ compact = false }) {
   );
 }
 
-function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout, incidentsList, alertsList, activityList, refreshData }) {
+function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout, incidentsList, alertsList, activityList, refreshData, onReportCreated }) {
   const role = session.role;
   const [profileOpen, setProfileOpen] = useState(false);
   const desktopViews = [
@@ -817,7 +841,7 @@ function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout,
         </header>
 
         {activeView === 'command' && <Protected permission="incident:assigned" role={role} fallbackPermission="incident:all"><CommandCenter metrics={metrics} role={role} incidentsList={incidentsList} /></Protected>}
-        {activeView === 'report' && <Protected permission="report:create" role={role}><ReportHazard session={session} activityList={activityList} refreshData={refreshData} /></Protected>}
+        {activeView === 'report' && <Protected permission="report:create" role={role}><ReportHazard session={session} activityList={activityList} refreshData={refreshData} onReportCreated={onReportCreated} /></Protected>}
         {activeView === 'timeline' && <Protected permission="incident:resolve" role={role}><IncidentTimeline incident={activeIncident} role={role} refreshData={refreshData} /></Protected>}
         {activeView === 'analytics' && <Protected permission="analytics:view" role={role}><Analytics metrics={metrics} role={role} /></Protected>}
       </div>
@@ -997,7 +1021,7 @@ function Protocols() {
   );
 }
 
-function ReportHazard({ session, activityList, refreshData }) {
+function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Infrastructure');
   const [location, setLocation] = useState('');
@@ -1046,9 +1070,11 @@ function ReportHazard({ session, activityList, refreshData }) {
           .from('activity_logs')
           .insert([{ description: `New hazard report ${reportId} submitted by ${reporter}.` }]);
 
+        if (onReportCreated) onReportCreated(newReport);
         if (refreshData) await refreshData();
         alert(`Report ${reportId} submitted successfully.`);
       } else {
+        if (onReportCreated) onReportCreated(newReport);
         alert(`Supabase is not configured. (Mock) Submitted Report ${reportId}!`);
       }
 
@@ -1337,7 +1363,7 @@ function Analytics({ metrics }) {
   );
 }
 
-function MobileApp({ view, setView, activeIncident, session, onLogout, incidentsList, alertsList, activityList, refreshData }) {
+function MobileApp({ view, setView, activeIncident, session, onLogout, incidentsList, alertsList, activityList, refreshData, onReportCreated }) {
   const role = session.role;
   const [profileOpen, setProfileOpen] = useState(false);
   const mobileViews = [
@@ -1365,7 +1391,7 @@ function MobileApp({ view, setView, activeIncident, session, onLogout, incidents
       </header>
 
       {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard incidentsList={incidentsList} activityList={activityList} role={role} /></Protected>}
-      {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport session={session} refreshData={refreshData} /></Protected>}
+      {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport session={session} refreshData={refreshData} onReportCreated={onReportCreated} /></Protected>}
       {activeView === 'tracker' && <Protected role={role} permission="report:own" fallbackPermission="incident:resolve"><MobileTracker incident={activeIncident} /></Protected>}
       {activeView === 'alerts' && <Protected role={role} permission="alerts:view" fallbackPermission="alerts:manage"><MobileAlerts role={role} alertsList={alertsList} /></Protected>}
 
@@ -1389,7 +1415,7 @@ function MobileNavButton({ icon: Icon, label, active, onClick }) {
 }
 
 function MobileDashboard({ incidentsList, activityList, role }) {
-  const ownsOnly = hasAccess(role, 'report:own') && !canUseOperationalSearch(role);
+  const ownsOnly = seesOwnReportsOnly(role);
   const totalReports = incidentsList.length;
   const resolvedReports = incidentsList.filter(i => i.status === 'Resolved').length;
 
@@ -1407,7 +1433,15 @@ function MobileDashboard({ incidentsList, activityList, role }) {
         <h2>{ownsOnly ? 'My Active Reports' : 'Active Reports'}</h2>
         <button>View All</button>
       </div>
-      {(incidentsList || []).slice(0, 4).map((incident) => <MobileReportCard key={incident.id} incident={incident} />)}
+      {(incidentsList || []).length > 0 ? (
+        (incidentsList || []).slice(0, 4).map((incident) => <MobileReportCard key={incident.id} incident={incident} />)
+      ) : (
+        <div className="mobile-empty-state glass-panel">
+          <FileText size={24} />
+          <h3>No reports yet</h3>
+          <p>Reports you submit will appear here with their latest response status.</p>
+        </div>
+      )}
       <div className="section-title">
         <h2>Recent Activity</h2>
       </div>
@@ -1418,7 +1452,7 @@ function MobileDashboard({ incidentsList, activityList, role }) {
   );
 }
 
-function MobileReport({ session, refreshData }) {
+function MobileReport({ session, refreshData, onReportCreated }) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Electrical');
   const [location, setLocation] = useState('');
@@ -1459,9 +1493,11 @@ function MobileReport({ session, refreshData }) {
           .from('activity_logs')
           .insert([{ description: `Mobile report ${reportId} submitted at ${location}.` }]);
 
+        if (onReportCreated) onReportCreated(newReport);
         if (refreshData) await refreshData();
         alert(`Mobile report ${reportId} submitted successfully!`);
       } else {
+        if (onReportCreated) onReportCreated(newReport);
         alert(`Supabase not configured. (Mock) Submitted ${reportId}!`);
       }
 

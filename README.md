@@ -67,5 +67,5 @@ npm run build
 
 All tables inside the [supabase_schema.sql](file:///c:/Users/U%20S%20E%20R/Drips/Devfoma/Final/Christian/Environmental_health/supabase_schema.sql) schema enforce Row Level Security:
 - **Profiles:** Users can only modify their own profiles.
-- **Incident Reporting:** Students and staff can file concerns and view only their own reports. Officers, supervisors, administrators, and management can view broader operational records according to their assigned role. Only administrators, supervisors, and officers can edit assignments or update resolution parameters.
+- **Incident Reporting:** Students and staff can file concerns and view only the reports they submitted on their own dashboard. Officers, supervisors, administrators, and management can view broader operational records according to their assigned role. Only administrators, supervisors, and officers can edit assignments or update resolution parameters.
 - **Alerts:** Only supervisors or administrators can insert safety notifications.

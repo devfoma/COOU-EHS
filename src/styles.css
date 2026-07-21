@@ -1513,12 +1513,13 @@ button:disabled {
     font-size: 13px;
   }
 
-  .mobile-report-card,
-  .tracker-card,
-  .mobile-activity,
-  .mobile-alert {
-    padding: 16px;
-  }
+.mobile-report-card,
+.tracker-card,
+.mobile-activity,
+.mobile-alert,
+.mobile-empty-state {
+  padding: 16px;
+}
 
   .mobile-report-card > div,
   .tracker-card {
@@ -1535,14 +1536,29 @@ button:disabled {
     font-family: Outfit, Inter, sans-serif;
   }
 
-  .mobile-report-card p,
-  .mobile-alert p,
-  .assist-card p,
-  .mobile-activity p {
-    margin: 0;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
+.mobile-report-card p,
+.mobile-alert p,
+.assist-card p,
+.mobile-activity p,
+.mobile-empty-state p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.mobile-empty-state {
+  display: grid;
+  gap: 8px;
+}
+
+.mobile-empty-state svg {
+  color: var(--green);
+}
+
+.mobile-empty-state h3 {
+  margin: 0;
+  font-family: Outfit, Inter, sans-serif;
+}
 
   .category-button {
     display: grid;
