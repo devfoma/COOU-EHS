@@ -98,6 +98,10 @@ function hasAccess(role, permission) {
   return roles[role]?.permissions.includes(permission) || false;
 }
 
+function canUseOperationalSearch(role) {
+  return hasAccess(role, 'incident:assigned') || hasAccess(role, 'incident:all') || hasAccess(role, 'analytics:view');
+}
+
 function getSafeRole(role) {
   return roles[role] ? role : 'student';
 }
@@ -800,10 +804,12 @@ function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout,
             ))}
           </div>
           <div className="topbar-actions">
-            <label className="search-box">
-              <Search size={16} />
-              <input placeholder="Search incident, protocol, officer..." />
-            </label>
+            {canUseOperationalSearch(role) && (
+              <label className="search-box">
+                <Search size={16} />
+                <input placeholder="Search incident, protocol, officer..." />
+              </label>
+            )}
             <AccessBadge role={role} />
             <button className="icon-button" aria-label="Notifications"><Bell size={20} /></button>
             <button className="icon-button" aria-label="Open profile" onClick={() => setProfileOpen(true)}><UserCircle size={20} /></button>
@@ -1358,7 +1364,7 @@ function MobileApp({ view, setView, activeIncident, session, onLogout, incidents
         <button className="icon-button" aria-label="Open profile" onClick={() => setProfileOpen(true)}><UserCircle size={20} /></button>
       </header>
 
-      {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard incidentsList={incidentsList} activityList={activityList} /></Protected>}
+      {activeView === 'dashboard' && <Protected role={role} permission="report:own"><MobileDashboard incidentsList={incidentsList} activityList={activityList} role={role} /></Protected>}
       {activeView === 'report' && <Protected role={role} permission="report:create"><MobileReport session={session} refreshData={refreshData} /></Protected>}
       {activeView === 'tracker' && <Protected role={role} permission="report:own" fallbackPermission="incident:resolve"><MobileTracker incident={activeIncident} /></Protected>}
       {activeView === 'alerts' && <Protected role={role} permission="alerts:view" fallbackPermission="alerts:manage"><MobileAlerts role={role} alertsList={alertsList} /></Protected>}
@@ -1382,7 +1388,8 @@ function MobileNavButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-function MobileDashboard({ incidentsList, activityList }) {
+function MobileDashboard({ incidentsList, activityList, role }) {
+  const ownsOnly = hasAccess(role, 'report:own') && !canUseOperationalSearch(role);
   const totalReports = incidentsList.length;
   const resolvedReports = incidentsList.filter(i => i.status === 'Resolved').length;
 
@@ -1390,14 +1397,14 @@ function MobileDashboard({ incidentsList, activityList }) {
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">My safety impact</p>
-        <h1>Campus Dashboard</h1>
+        <h1>{ownsOnly ? 'My Safety Dashboard' : 'Campus Dashboard'}</h1>
       </section>
       <div className="mobile-metrics">
-        <MetricMini value={String(totalReports)} label="Total Reports" />
+        <MetricMini value={String(totalReports)} label={ownsOnly ? 'My Reports' : 'Total Reports'} />
         <MetricMini value={String(resolvedReports)} label="Resolved Cases" />
       </div>
       <div className="section-title">
-        <h2>Active Reports</h2>
+        <h2>{ownsOnly ? 'My Active Reports' : 'Active Reports'}</h2>
         <button>View All</button>
       </div>
       {(incidentsList || []).slice(0, 4).map((incident) => <MobileReportCard key={incident.id} incident={incident} />)}
