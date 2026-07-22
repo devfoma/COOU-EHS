@@ -23,6 +23,7 @@ import {
   LogIn,
   Mail,
   MapPin,
+  Menu,
   Plus,
   Search,
   Send,
@@ -468,6 +469,7 @@ function PublicGateway({ authLoading, authError }) {
   const [name, setName] = useState('');
   const [department, setDepartment] = useState('');
   const [role, setRole] = useState('student');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState('');
   const [formError, setFormError] = useState('');
@@ -476,6 +478,7 @@ function PublicGateway({ authLoading, authError }) {
 
   const openAuthModal = (nextMode) => {
     setAuthModal(nextMode);
+    setMobileMenuOpen(false);
     setFormError('');
     setFormMessage('');
   };
@@ -533,12 +536,21 @@ function PublicGateway({ authLoading, authError }) {
 
   return (
     <main className="public-shell">
-      <header className="public-header">
+      <header className={`public-header ${mobileMenuOpen ? 'menu-open' : ''}`}>
         <Brand />
+        <button
+          className="public-menu-button"
+          type="button"
+          aria-label={mobileMenuOpen ? 'Close landing navigation' : 'Open landing navigation'}
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
         <nav className="public-nav" aria-label="Landing page navigation">
-          <a href="#safety-guide">Safety guide</a>
-          <a href="#get-started">Get started</a>
-          <a href="#dashboards">Dashboards</a>
+          <a href="#safety-guide" onClick={() => setMobileMenuOpen(false)}>Safety guide</a>
+          <a href="#get-started" onClick={() => setMobileMenuOpen(false)}>Get started</a>
+          <a href="#dashboards" onClick={() => setMobileMenuOpen(false)}>Dashboards</a>
         </nav>
         <div className="public-header-actions">
           <button className="ghost-button" type="button" onClick={() => openAuthModal('signIn')}>
