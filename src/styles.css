@@ -736,10 +736,15 @@ button:disabled {
 }
 
 .guide-modal-backdrop {
-  z-index: 130;
+  position: fixed;
+  z-index: 100000;
+  isolation: isolate;
+  pointer-events: auto;
 }
 
 .guide-modal {
+  position: relative;
+  z-index: 100001;
   width: min(100%, 420px);
 }
 
