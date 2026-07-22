@@ -711,6 +711,79 @@ button:disabled {
   color: var(--green);
 }
 
+.guide-tip {
+  position: relative;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.guide-button {
+  display: inline-grid;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  place-items: center;
+  color: var(--green);
+  background: rgba(36, 214, 161, 0.12);
+  border: 1px solid rgba(36, 214, 161, 0.32);
+  border-radius: 999px;
+  box-shadow: none;
+  cursor: help;
+}
+
+.guide-button:hover,
+.guide-button:focus-visible {
+  color: var(--ink);
+  background: var(--green);
+  outline: 0;
+}
+
+.guide-popover {
+  position: absolute;
+  top: 34px;
+  left: 0;
+  z-index: 50;
+  display: none;
+  width: min(286px, calc(100vw - 32px));
+  padding: 12px 13px;
+  color: var(--text-muted);
+  background: rgba(3, 17, 31, 0.98);
+  border: 1px solid rgba(212, 228, 250, 0.22);
+  border-radius: 8px;
+  box-shadow: 0 16px 42px rgba(1, 15, 31, 0.5);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-align: left;
+  text-transform: none;
+}
+
+.guide-popover strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-family: Outfit, Inter, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.guide-popover span {
+  display: block;
+}
+
+.guide-tip:hover .guide-popover,
+.guide-tip:focus-within .guide-popover {
+  display: block;
+}
+
 .page-heading p {
   margin: 0;
   color: var(--text-muted);
@@ -751,6 +824,9 @@ button:disabled {
 }
 
 .field-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
   margin: 16px 0 8px;
 }
 
@@ -1847,6 +1923,24 @@ button:disabled {
 }
 
 @media (max-width: 520px) {
+  .guide-button {
+    width: 24px;
+    height: 24px;
+  }
+
+  .guide-popover {
+    top: 31px;
+    right: 0;
+    left: auto;
+    width: min(260px, calc(100vw - 32px));
+  }
+
+  .page-heading h1 .guide-tip,
+  .mobile-hero h1 .guide-tip,
+  .section-title h2 .guide-tip {
+    margin-left: 6px;
+  }
+
   .mobile-metrics,
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -17,6 +17,7 @@ import {
   Filter,
   Flame,
   Home,
+  Info,
   LayoutDashboard,
   LogIn,
   Mail,
@@ -574,7 +575,12 @@ function PublicGateway({ authLoading, authError }) {
 
       <section className="public-grid">
         <article className="glass-panel public-info-card">
-          <h2>What to report</h2>
+          <h2>
+            What to report
+            <GuideTip title="Report criteria">
+              Report anything that could harm people, interrupt safe learning, or damage campus facilities. If you are unsure, submit it and let EHS review it.
+            </GuideTip>
+          </h2>
           <ul>
             <li>Waste buildup, sanitation issues, and blocked drainage.</li>
             <li>Faulty lighting, damaged railings, unsafe buildings, or exposed wiring.</li>
@@ -582,7 +588,12 @@ function PublicGateway({ authLoading, authError }) {
           </ul>
         </article>
         <article className="glass-panel public-info-card restricted">
-          <h2>Before you submit</h2>
+          <h2>
+            Before you submit
+            <GuideTip title="Useful details">
+              Add the location, risk level, and a short description. Photos help, but only take them when it is safe.
+            </GuideTip>
+          </h2>
           <ul>
             <li>Give the exact location, including building, floor, room, or landmark.</li>
             <li>Add a clear photo when it is safe to do so.</li>
@@ -590,7 +601,12 @@ function PublicGateway({ authLoading, authError }) {
           </ul>
         </article>
         <article className="glass-panel public-info-card">
-          <h2>After reporting</h2>
+          <h2>
+            After reporting
+            <GuideTip title="Tracking">
+              Your dashboard shows reports you submitted, their current status, and response progress as the safety team works on them.
+            </GuideTip>
+          </h2>
           <ul>
             <li>Your report receives a tracking record.</li>
             <li>An EHS officer or unit reviews and updates the response status.</li>
@@ -598,7 +614,12 @@ function PublicGateway({ authLoading, authError }) {
           </ul>
         </article>
         <article className="glass-panel public-info-card">
-          <h2>If it is urgent</h2>
+          <h2>
+            If it is urgent
+            <GuideTip title="Emergency guidance">
+              For immediate danger, move away first and use campus emergency channels. COUU-EHS records the issue, but it does not replace emergency response.
+            </GuideTip>
+          </h2>
           <ul>
             <li>Move away from immediate danger first.</li>
             <li>Warn nearby students or staff where safe.</li>
@@ -897,26 +918,45 @@ function CommandCenter({ metrics, incidentsList }) {
       <section className="page-heading">
         <div>
           <p className="eyebrow">Real-time safety intelligence</p>
-          <h1>Officer Command Center</h1>
+          <h1>
+            Officer Command Center
+            <GuideTip title="Dashboard guide">
+              This workspace is for reviewing live reports, narrowing them by category or severity, and deciding which incidents need response first.
+            </GuideTip>
+          </h1>
           <p>Monitor active hazards, assign response units, and keep COOU facilities compliant.</p>
         </div>
         <button className="secondary-button"><Download size={18} /> Shift Report</button>
       </section>
 
       <aside className="filter-panel glass-panel">
-        <h2><Filter size={18} /> Filters</h2>
-        <FieldLabel label="Hazard Category" />
+        <h2>
+          <Filter size={18} /> Filters
+          <GuideTip title="Using filters">
+            Filters help officers focus on a specific hazard type, priority level, or campus area before assigning response work.
+          </GuideTip>
+        </h2>
+        <FieldLabel
+          label="Hazard Category"
+          guide="Use categories to group similar risks such as laboratory, infrastructure, waste, or electrical issues."
+        />
         <CheckRow label="Laboratory" checked />
         <CheckRow label="Infrastructure" checked />
         <CheckRow label="Waste Management" />
         <CheckRow label="Electrical" />
-        <FieldLabel label="Priority Level" />
+        <FieldLabel
+          label="Priority Level"
+          guide="Critical means immediate danger, Warning means urgent follow-up, and Stable means the area still needs review but is not escalating."
+        />
         <div className="chip-grid">
           <SeverityChip severity="critical" label="Critical" />
           <SeverityChip severity="high" label="Warning" />
           <SeverityChip severity="low" label="Stable" />
         </div>
-        <FieldLabel label="Facility Location" />
+        <FieldLabel
+          label="Facility Location"
+          guide="Select a campus zone to focus the feed on reports from that location."
+        />
         <select>
           <option>All campus zones</option>
           <option>Science Complex</option>
@@ -930,7 +970,12 @@ function CommandCenter({ metrics, incidentsList }) {
           {metrics.slice(0, 3).map((metric) => <MetricCard key={metric.label} metric={metric} />)}
         </div>
         <div className="section-title">
-          <h2>Active Incident Feed</h2>
+          <h2>
+            Active Incident Feed
+            <GuideTip title="Incident cards">
+              Each card shows severity, location, timing, assigned unit, and progress so officers can quickly decide the next action.
+            </GuideTip>
+          </h2>
           <div className="view-toggle">
             <button className="active">Grid</button>
             <button>List</button>
@@ -990,7 +1035,12 @@ function IncidentCard({ incident }) {
 function CampusMap() {
   return (
     <section className="glass-panel campus-map">
-      <h2>Campus Heat Map</h2>
+      <h2>
+        Campus Heat Map
+        <GuideTip title="Heat map guide">
+          Pins show where active risks are concentrated so officers can spot repeated problem areas.
+        </GuideTip>
+      </h2>
       <div className="map-box">
         <span className="pin pin-critical" />
         <span className="pin pin-high" />
@@ -1011,7 +1061,12 @@ function Protocols() {
 
   return (
     <section className="glass-panel protocols">
-      <h2>Urgent Protocols</h2>
+      <h2>
+        Urgent Protocols
+        <GuideTip title="Protocol guide">
+          Use these response shortcuts for common emergency workflows that need fast coordination.
+        </GuideTip>
+      </h2>
       {protocols.map(({ icon: Icon, title }) => (
         <button key={title}>
           <Icon size={20} />
@@ -1098,7 +1153,12 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
       <section className="page-heading full">
         <div>
           <p className="eyebrow">Digital hazard reporting</p>
-          <h1>Report a Campus Hazard</h1>
+          <h1>
+            Report a Campus Hazard
+            <GuideTip title="Reporting guide">
+              Fill the required fields with enough detail for EHS to find the hazard, judge the risk, and assign a response team.
+            </GuideTip>
+          </h1>
           <p>Capture the details officers need to prioritize, assign, and resolve safety incidents.</p>
         </div>
       </section>
@@ -1106,7 +1166,10 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
       <form className="glass-panel hazard-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <label>
-            <FieldLabel label="Hazard Title *" />
+            <FieldLabel
+              label="Hazard Title *"
+              guide="Use a short, clear title that names the problem, for example: Broken stair rail at Faculty Block."
+            />
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -1115,7 +1178,10 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
             />
           </label>
           <label>
-            <FieldLabel label="Category *" />
+            <FieldLabel
+              label="Category *"
+              guide="Choose the closest hazard type. If it does not fit perfectly, pick the nearest option and explain it in the description."
+            />
             <select value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value="Laboratory">Laboratory</option>
               <option value="Infrastructure">Infrastructure</option>
@@ -1125,7 +1191,10 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
             </select>
           </label>
           <label>
-            <FieldLabel label="Exact Location *" />
+            <FieldLabel
+              label="Exact Location *"
+              guide="Include building, floor, room, office, landmark, or nearby facility so responders can find it quickly."
+            />
             <input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
@@ -1134,7 +1203,10 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
             />
           </label>
           <label>
-            <FieldLabel label="Reporter Name *" />
+            <FieldLabel
+              label="Reporter Name *"
+              guide="Use your name or department so the response team can follow up if more details are needed."
+            />
             <input
               value={reporter}
               onChange={(e) => setReporter(e.target.value)}
@@ -1144,14 +1216,20 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
           </label>
         </div>
 
-        <FieldLabel label="Evidence Documentation" />
+        <FieldLabel
+          label="Evidence Documentation"
+          guide="Add a photo or document only when it is safe. Never move closer to a hazard just to capture evidence."
+        />
         <div className="upload-zone">
           <Camera size={28} />
           <strong>Upload photo or document evidence</strong>
           <span>PNG, JPG, or PDF up to 10MB</span>
         </div>
 
-        <FieldLabel label="Severity Level" />
+        <FieldLabel
+          label="Severity Level"
+          guide="Low is minor, Medium needs attention, High could cause injury or disruption, and Critical means immediate danger."
+        />
         <div className="severity-selector">
           {['low', 'medium', 'high', 'critical'].map((s) => (
             <button
@@ -1166,7 +1244,10 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
         </div>
 
         <label>
-          <FieldLabel label="Detailed Description *" />
+          <FieldLabel
+            label="Detailed Description *"
+            guide="Describe what happened, who may be affected, immediate dangers, and any action already taken."
+          />
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -1248,14 +1329,24 @@ function IncidentTimeline({ incident, refreshData }) {
       <section className="page-heading full">
         <div>
           <p className="eyebrow">Incident details</p>
-          <h1>Incident <span>{incident.id}</span></h1>
+          <h1>
+            Incident <span>{incident.id}</span>
+            <GuideTip title="Incident tracking">
+              This view records response progress and the final safety checks needed before a hazard can be marked resolved.
+            </GuideTip>
+          </h1>
           <p>{incident.title} at {incident.location}</p>
         </div>
         <SeverityChip severity={incident.severity} />
       </section>
 
       <section className="glass-panel timeline-panel">
-        <h2>Resolution Timeline</h2>
+        <h2>
+          Resolution Timeline
+          <GuideTip title="Progress stages">
+            Reported means the issue was submitted, Assigned means a responder owns it, In Progress means checks are underway, and Resolved means safety work is complete.
+          </GuideTip>
+        </h2>
         <div className="timeline">
           {steps.map((step) => (
             <article key={step.title} className={step.done ? 'done' : ''}>
@@ -1270,9 +1361,17 @@ function IncidentTimeline({ incident, refreshData }) {
       </section>
 
       <aside className="glass-panel resolution-form">
-        <h2>Resolution Form</h2>
+        <h2>
+          Resolution Form
+          <GuideTip title="Closure details">
+            Officers use this form to document the final action, add safety readings, attach proof, and confirm the location is ready for verification.
+          </GuideTip>
+        </h2>
         <label>
-          <FieldLabel label="Final Disposition Summary" />
+          <FieldLabel
+            label="Final Disposition Summary"
+            guide="Summarize what was repaired, cleaned, isolated, replaced, or inspected before closure."
+          />
           <textarea
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
@@ -1282,7 +1381,10 @@ function IncidentTimeline({ incident, refreshData }) {
         </label>
         <div className="form-grid single">
           <label>
-            <FieldLabel label="Air Quality (PPM)" />
+            <FieldLabel
+              label="Air Quality (PPM)"
+              guide="Enter a reading when air quality checks apply. Leave blank if this incident does not require it."
+            />
             <input
               value={airQuality}
               onChange={(e) => setAirQuality(e.target.value)}
@@ -1290,7 +1392,10 @@ function IncidentTimeline({ incident, refreshData }) {
             />
           </label>
           <label>
-            <FieldLabel label="Surface PH" />
+            <FieldLabel
+              label="Surface PH"
+              guide="Use this for spill or chemical cleanup verification. Neutral readings are usually around pH 7."
+            />
             <input
               value={surfacePh}
               onChange={(e) => setSurfacePh(e.target.value)}
@@ -1300,7 +1405,12 @@ function IncidentTimeline({ incident, refreshData }) {
         </div>
         <div className="upload-zone compact">
           <Camera size={22} />
-          <strong>Upload post-cleanup proof</strong>
+          <strong>
+            Upload post-cleanup proof
+            <GuideTip title="Proof guide">
+              Add final photos or documents showing the area was cleaned, repaired, or made safe.
+            </GuideTip>
+          </strong>
         </div>
         <label className="signoff">
           <input
@@ -1329,7 +1439,12 @@ function Analytics({ metrics }) {
       <section className="page-heading full">
         <div>
           <p className="eyebrow">Compliance and performance audit</p>
-          <h1>Executive Analytics</h1>
+          <h1>
+            Executive Analytics
+            <GuideTip title="Analytics guide">
+              This dashboard summarizes safety performance, recurring hazard patterns, and compliance observations for decision makers.
+            </GuideTip>
+          </h1>
           <p>Track institutional safety performance and recurring environmental health risks.</p>
         </div>
         <button className="secondary-button"><Download size={18} /> Export Audit</button>
@@ -1341,7 +1456,12 @@ function Analytics({ metrics }) {
 
       <section className="glass-panel chart-panel">
         <div className="section-title">
-          <h2>Incident Trends</h2>
+          <h2>
+            Incident Trends
+            <GuideTip title="Trend view">
+              Compare periods to spot recurring risks, slower response areas, or locations that need preventive action.
+            </GuideTip>
+          </h2>
           <div className="view-toggle"><button className="active">Monthly</button><button>Quarterly</button></div>
         </div>
         <div className="bar-chart">
@@ -1352,7 +1472,12 @@ function Analytics({ metrics }) {
       </section>
 
       <section className="glass-panel audit-table">
-        <h2>Audit Observations</h2>
+        <h2>
+          Audit Observations
+          <GuideTip title="Audit notes">
+            These items highlight compliance issues and improvements that management should review during safety planning.
+          </GuideTip>
+        </h2>
         {['Laboratory storage labeling needs review', 'Emergency exit obstruction resolved', 'Waste pickup frequency improved'].map((item, index) => (
           <div key={item}>
             <span>0{index + 1}</span>
@@ -1428,14 +1553,24 @@ function MobileDashboard({ incidentsList, activityList, role }) {
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">My safety impact</p>
-        <h1>{ownsOnly ? 'My Safety Dashboard' : 'Campus Dashboard'}</h1>
+        <h1>
+          {ownsOnly ? 'My Safety Dashboard' : 'Campus Dashboard'}
+          <GuideTip title="Dashboard guide">
+            Use this screen to check your submitted reports, resolved cases, recent updates, and the next safety action you may need to take.
+          </GuideTip>
+        </h1>
       </section>
       <div className="mobile-metrics">
         <MetricMini value={String(totalReports)} label={ownsOnly ? 'My Reports' : 'Total Reports'} />
         <MetricMini value={String(resolvedReports)} label="Resolved Cases" />
       </div>
       <div className="section-title">
-        <h2>{ownsOnly ? 'Latest Reports' : 'Active Reports'}</h2>
+        <h2>
+          {ownsOnly ? 'Latest Reports' : 'Active Reports'}
+          <GuideTip title="Report list">
+            These are the newest reports visible to your role. Students and staff only see reports they submitted.
+          </GuideTip>
+        </h2>
       </div>
       {latestReports.length > 0 ? (
         latestReports.map((incident) => <MobileReportCard key={incident.id} incident={incident} />)
@@ -1447,7 +1582,12 @@ function MobileDashboard({ incidentsList, activityList, role }) {
         </div>
       )}
       <div className="section-title">
-        <h2>Recent Activity</h2>
+        <h2>
+          Recent Activity
+          <GuideTip title="Activity updates">
+            Activity entries show report submissions, response updates, and system notes relevant to your dashboard.
+          </GuideTip>
+        </h2>
       </div>
       <div className="mobile-activity glass-panel">
         {(activityList || []).slice(0, 3).map((item, idx) => <p key={idx}>{item}</p>)}
@@ -1466,15 +1606,20 @@ function MyReports({ reports, role, compact = false }) {
       <section className={compact ? 'mobile-hero' : 'page-heading full'}>
         <div>
           <p className="eyebrow">{ownsOnly ? 'Submitted by you' : 'Report records'}</p>
-          <h1>My Reports</h1>
+          <h1>
+            My Reports
+            <GuideTip title="My Reports guide">
+              This tab keeps the hazard reports you submitted in one place so you can follow status, location, severity, and progress.
+            </GuideTip>
+          </h1>
           <p>{ownsOnly ? 'Track the hazards you have submitted and follow their response status.' : 'Review submitted reports available to your role.'}</p>
         </div>
       </section>
 
       <div className="my-report-summary">
-        <MetricMini value={String((reports || []).length)} label="All Reports" />
-        <MetricMini value={String(activeReports.length)} label="Active" />
-        <MetricMini value={String(resolvedReports.length)} label="Resolved" />
+        <MetricMini value={String((reports || []).length)} label="All Reports" guide="Total reports visible in this tab." />
+        <MetricMini value={String(activeReports.length)} label="Active" guide="Reports still waiting for review, assignment, or resolution." />
+        <MetricMini value={String(resolvedReports.length)} label="Resolved" guide="Reports marked resolved or closed after response work." />
       </div>
 
       <section className="my-report-list">
@@ -1570,11 +1715,19 @@ function MobileReport({ session, refreshData, onReportCreated }) {
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">Fast field report</p>
-        <h1>Report Hazard</h1>
+        <h1>
+          Report Hazard
+          <GuideTip title="Mobile reporting guide">
+            Submit a quick report from your phone with title, category, location, risk level, and details.
+          </GuideTip>
+        </h1>
       </section>
 
       <label style={{ display: 'block', marginBottom: '10px' }}>
-        <FieldLabel label="Report Title *" />
+        <FieldLabel
+          label="Report Title *"
+          guide="Keep it short and specific so the report is easy to identify later."
+        />
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -1583,6 +1736,10 @@ function MobileReport({ session, refreshData, onReportCreated }) {
         />
       </label>
 
+      <FieldLabel
+        label="Category"
+        guide="Pick the option that best matches the hazard so the right response team can review it."
+      />
       <div className="category-grid">
         {[
           { key: 'Electrical', icon: Zap },
@@ -1600,7 +1757,10 @@ function MobileReport({ session, refreshData, onReportCreated }) {
         ))}
       </div>
       <label>
-        <FieldLabel label="Location *" />
+        <FieldLabel
+          label="Location *"
+          guide="Add the building, room, floor, or nearby landmark."
+        />
         <input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
@@ -1610,9 +1770,17 @@ function MobileReport({ session, refreshData, onReportCreated }) {
       </label>
       <div className="upload-zone compact">
         <Camera size={24} />
-        <strong>Add visual evidence</strong>
+        <strong>
+          Add visual evidence
+          <GuideTip title="Evidence guide">
+            Add a clear photo when safe. Skip this if taking a photo would put you near danger.
+          </GuideTip>
+        </strong>
       </div>
-      <FieldLabel label="Risk Level" />
+      <FieldLabel
+        label="Risk Level"
+        guide="Low is minor, Medium needs attention, High could cause injury or disruption, and Critical means immediate danger."
+      />
       <div className="mobile-risk">
         {['low', 'medium', 'high', 'critical'].map((r) => (
           <button
@@ -1626,7 +1794,10 @@ function MobileReport({ session, refreshData, onReportCreated }) {
         ))}
       </div>
       <label>
-        <FieldLabel label="Incident Details *" />
+        <FieldLabel
+          label="Incident Details *"
+          guide="Explain what is unsafe, who may be affected, and whether anyone has already taken action."
+        />
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -1652,7 +1823,12 @@ function MobileTracker({ incident }) {
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">Incident #{incident.id}</p>
-        <h1>{incident.title}</h1>
+        <h1>
+          {incident.title}
+          <GuideTip title="Tracker guide">
+            Follow where your report is in the response process and enable update notifications when needed.
+          </GuideTip>
+        </h1>
       </section>
       <article className="glass-panel tracker-card">
         <div>
@@ -1665,7 +1841,12 @@ function MobileTracker({ incident }) {
         </div>
       </article>
       <section className="glass-panel mini-timeline">
-        <h2>Resolution Progress</h2>
+        <h2>
+          Resolution Progress
+          <GuideTip title="Progress stages">
+            Each stage shows whether your report is still submitted, assigned, in progress, or resolved.
+          </GuideTip>
+        </h2>
         {['Reported', 'Assigned', 'In Progress', 'Resolved'].map((step, index) => {
           const isDone =
             (step === 'Reported') ||
@@ -1691,7 +1872,12 @@ function MobileAlerts({ role, alertsList }) {
     <div className="mobile-screen">
       <section className="mobile-hero">
         <p className="eyebrow">Live campus notices</p>
-        <h1>Campus Alerts</h1>
+        <h1>
+          Campus Alerts
+          <GuideTip title="Alert guide">
+            Alerts communicate campus safety notices, affected locations, and timing for issues that users should know about.
+          </GuideTip>
+        </h1>
       </section>
       {(alertsList || []).map((alert) => (
         <article key={alert.id || alert.title} className={`mobile-alert glass-panel ${alert.severity}`}>
@@ -1705,7 +1891,12 @@ function MobileAlerts({ role, alertsList }) {
       <section className="assist-card">
         <Siren size={28} />
         <div>
-          <h2>Immediate Assistance?</h2>
+          <h2>
+            Immediate Assistance?
+            <GuideTip title="Emergency help">
+              Use emergency response for immediate danger. Submit a COUU-EHS report afterward when it is safe.
+            </GuideTip>
+          </h2>
           <p>Call campus emergency response.</p>
         </div>
       </section>
@@ -1713,11 +1904,14 @@ function MobileAlerts({ role, alertsList }) {
   );
 }
 
-function MetricMini({ value, label }) {
+function MetricMini({ value, label, guide }) {
   return (
     <article className="glass-panel metric-mini">
       <strong>{value}</strong>
-      <span>{label}</span>
+      <span>
+        {label}
+        {guide && <GuideTip title={label}>{guide}</GuideTip>}
+      </span>
     </article>
   );
 }
@@ -1794,8 +1988,27 @@ function CheckRow({ label, checked }) {
   );
 }
 
-function FieldLabel({ label }) {
-  return <span className="field-label">{label}</span>;
+function GuideTip({ title, children }) {
+  return (
+    <span className="guide-tip">
+      <button className="guide-button" type="button" aria-label={`Guide: ${title}`}>
+        <Info size={14} />
+      </button>
+      <span className="guide-popover" role="tooltip">
+        <strong>{title}</strong>
+        <span>{children}</span>
+      </span>
+    </span>
+  );
+}
+
+function FieldLabel({ label, guide, guideTitle }) {
+  return (
+    <span className="field-label">
+      {label}
+      {guide && <GuideTip title={guideTitle || label}>{guide}</GuideTip>}
+    </span>
+  );
 }
 
 function SeverityChip({ severity, label }) {
