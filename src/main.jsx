@@ -1480,7 +1480,7 @@ function MyReports({ reports, role, compact = false }) {
       <section className="my-report-list">
         {(reports || []).length > 0 ? (
           (reports || []).map((report) => (
-            <article key={report.id} className="glass-panel my-report-row">
+            <article key={report.id} className={`glass-panel my-report-row ${report.severity}`}>
               <div>
                 <SeverityChip severity={report.severity} />
                 <span className="report-code">{report.id}</span>
