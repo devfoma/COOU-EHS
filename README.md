@@ -1,13 +1,14 @@
 # COUU-EHS (Environmental Health and Safety System)
 
-COUU-EHS is a responsive Environmental Health and Safety Application System designed for Chukwuemeka Odumegwu Ojukwu University (COOU). The platform enables digital reporting of campus hazards, response tracking, safety alert publication, and compliance reporting.
+COUU-EHS is a responsive Environmental Health and Safety Application System designed for campus hazard reporting, response tracking, safety alert publication, and compliance reporting.
 
 ## 🚀 Features
 
-- **Triage Command Center:** EHS officers and supervisors can monitor active hazards, update timelines, and authorize closure requests.
+- **Admin Command Center:** Admin users can monitor active hazards, update timelines, manage alerts, review analytics, and authorize closure requests.
 - **Digital Field Reporting:** Students and staff can submit safety hazards with location, category, severity, and photo evidence.
 - **Real-Time Safety Alerts:** Emergency notifications targeting specific campus sectors.
 - **Unified Safety Metrics:** Live counts for compliance reviews and performance audits.
+- **Three Dashboard Roles:** The application is limited to Student, Staff, and Admin dashboards.
 
 ---
 
@@ -18,7 +19,7 @@ The application features a full Supabase integration. When configured, it fetche
 ### 1. Database Tables Schema
 Run the SQL queries in [supabase_schema.sql](file:///c:/Users/U%20S%20E%20R/Drips/Devfoma/Final/Christian/Environmental_health/supabase_schema.sql) in your Supabase SQL Editor to provision the database:
 
-* **`profiles`:** User table mapping Auth IDs to roles (`student`, `staff`, `officer`, `supervisor`, `admin`, `management`).
+* **`profiles`:** User table mapping Auth IDs to roles (`student`, `staff`, `admin`).
 * **`hazard_reports`:** Records incidents, status workflows (`Reported`, `Assigned`, `In Progress`, `Resolved`), priorities, and response assignments.
 * **`alerts`:** Broad warnings or routine drills pushed to campus portals.
 * **`activity_logs`:** History of actions taken by safety personnel.
@@ -52,8 +53,7 @@ The sign-in modal uses Supabase Auth email/password sessions. On signup, the app
 
 Authenticated users can open their profile from the header to review their role and workspace access. Signing out is now an explicit action inside the profile modal.
 
-To grant elevated dashboards, update the user's `profiles.role` value in Supabase to one of:
-`officer`, `supervisor`, `admin`, or `management`.
+To grant the elevated operational dashboard, update the user's `profiles.role` value in Supabase to `admin`.
 
 ### Step 5: Build for Production
 To bundle the frontend with assets:
@@ -67,5 +67,5 @@ npm run build
 
 All tables inside the [supabase_schema.sql](file:///c:/Users/U%20S%20E%20R/Drips/Devfoma/Final/Christian/Environmental_health/supabase_schema.sql) schema enforce Row Level Security:
 - **Profiles:** Users can only modify their own profiles.
-- **Incident Reporting:** Students and staff can file concerns and view only the reports they submitted through a dedicated **My Reports** tab. Officers, supervisors, administrators, and management can view broader operational records according to their assigned role. Only administrators, supervisors, and officers can edit assignments or update resolution parameters.
-- **Alerts:** Only supervisors or administrators can insert safety notifications.
+- **Incident Reporting:** Students and staff can file concerns and view only the reports they submitted through a dedicated **My Reports** tab. Admin users can view broader operational records, edit assignments, and update resolution parameters.
+- **Alerts:** Only admin users can insert or manage safety notifications.

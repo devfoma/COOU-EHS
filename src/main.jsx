@@ -54,46 +54,33 @@ const roles = {
     description: 'Report workplace hazards and monitor personal safety submissions.',
     permissions: ['report:create', 'report:own', 'alerts:view']
   },
-  officer: {
-    label: 'EHS Officer',
-    description: 'View assigned incidents, update timelines, and submit resolution proof.',
-    permissions: ['report:create', 'incident:assigned', 'incident:resolve', 'alerts:view', 'protocols:view']
-  },
-  supervisor: {
-    label: 'Supervisor',
-    description: 'Assign incidents, approve closures, publish alerts, and review response work.',
-    permissions: ['report:create', 'incident:all', 'incident:resolve', 'incident:assign', 'alerts:manage', 'protocols:view']
-  },
   admin: {
-    label: 'Administrator',
-    description: 'Manage users, reports, locations, alerts, analytics, and system settings.',
-    permissions: ['report:create', 'incident:all', 'incident:resolve', 'incident:assign', 'alerts:manage', 'analytics:view', 'admin:manage', 'protocols:view']
-  },
-  management: {
-    label: 'Management',
-    description: 'Review institutional EHS performance, compliance trends, and audit summaries.',
-    permissions: ['analytics:view', 'incident:summary', 'alerts:view']
+    label: 'Admin',
+    description: 'Review reports, coordinate response, manage alerts, track analytics, and close incidents.',
+    permissions: ['report:create', 'incident:assigned', 'incident:all', 'incident:resolve', 'incident:assign', 'alerts:view', 'alerts:manage', 'analytics:view', 'admin:manage', 'protocols:view']
   }
 };
 
 const defaultDesktopViewByRole = {
   student: 'myReports',
   staff: 'myReports',
-  officer: 'command',
-  supervisor: 'command',
-  admin: 'command',
-  management: 'analytics'
+  admin: 'command'
 };
 
 const defaultMobileViewByRole = {
   student: 'dashboard',
   staff: 'dashboard',
-  officer: 'tracker',
-  supervisor: 'alerts',
-  admin: 'alerts',
-  management: 'alerts'
+  admin: 'dashboard'
 };
 
+const roleAliases = {
+  officer: 'admin',
+  supervisor: 'admin',
+  administrator: 'admin',
+  management: 'admin'
+};
+
+const dashboardRoles = ['student', 'staff', 'admin'];
 const selfServiceRoles = ['student', 'staff'];
 
 function hasAccess(role, permission) {
@@ -109,7 +96,8 @@ function seesOwnReportsOnly(role) {
 }
 
 function getSafeRole(role) {
-  return roles[role] ? role : 'student';
+  const normalizedRole = roleAliases[role] || role;
+  return roles[normalizedRole] ? normalizedRole : 'student';
 }
 
 function formatRelativeTime(value) {
@@ -201,7 +189,7 @@ const incidents = [
     severity: 'critical',
     status: 'In Progress',
     reporter: 'Dr. Ifeoma N.',
-    assignedTo: 'Officer Marcus R.',
+    assignedTo: 'Safety Response Unit',
     time: '12 min ago',
     description: 'Chemical odor detected near reagent storage. Students evacuated from adjacent rooms.',
     progress: 68
@@ -253,7 +241,7 @@ const alerts = [
     location: 'Science Complex',
     severity: 'critical',
     time: 'Active now',
-    body: 'Avoid Block C corridor until EHS officers complete containment.'
+    body: 'Avoid Block C corridor until the safety team completes containment.'
   },
   {
     title: 'Power Outage',
@@ -272,7 +260,7 @@ const alerts = [
 ];
 
 const activity = [
-  'Officer Marcus R. updated HAZ-2904 to In Progress.',
+  'Safety Response Unit updated HAZ-2904 to In Progress.',
   'New evidence uploaded for HAZ-1841.',
   'Sanitation Unit requested verification for HAZ-1377.',
   'Campus alert published for Science Complex.'
@@ -547,16 +535,28 @@ function PublicGateway({ authLoading, authError }) {
     <main className="public-shell">
       <header className="public-header">
         <Brand />
-        <span className="public-status">{authLoading ? 'Checking session' : 'Secure campus portal'}</span>
+        <nav className="public-nav" aria-label="Landing page navigation">
+          <a href="#safety-guide">Safety guide</a>
+          <a href="#get-started">Get started</a>
+          <a href="#dashboards">Dashboards</a>
+        </nav>
+        <div className="public-header-actions">
+          <button className="ghost-button" type="button" onClick={() => openAuthModal('signIn')}>
+            <LogIn size={17} /> Sign In
+          </button>
+          <button className="primary-button" type="button" onClick={() => openAuthModal('signUp')}>
+            <UserPlus size={17} /> Create Account
+          </button>
+        </div>
       </header>
 
       <section className="public-hero">
-        <div>
-          <p className="eyebrow">COOU Environmental Health and Safety</p>
-          <h1>A safer campus starts with faster reporting.</h1>
+        <div className="public-hero-copy">
+          <p className="eyebrow">COUU Environmental Health and Safety</p>
+          <h1>Report campus hazards before they become emergencies.</h1>
           <p>
-            COUU-EHS helps students, staff, and safety officers report hazards, coordinate response,
-            publish alerts, and keep campus facilities safer for learning and work.
+            COUU-EHS gives students and staff a simple way to report unsafe conditions, track
+            progress, and receive safety notices while admins coordinate response from one place.
           </p>
           <div className="landing-actions">
             <button className="primary-button" type="button" onClick={() => openAuthModal('signIn')}>
@@ -566,15 +566,27 @@ function PublicGateway({ authLoading, authError }) {
               <UserPlus size={18} /> Create Account
             </button>
           </div>
+          <div className="hero-stats" aria-label="COUU-EHS service highlights">
+            <span><strong>3</strong> focused dashboards</span>
+            <span><strong>24/7</strong> hazard logging</span>
+            <span><strong>1</strong> campus safety record</span>
+          </div>
         </div>
-        <div className="public-card glass-panel">
-          <ShieldCheck size={32} />
-          <h2>What you can do here</h2>
-          <p>Report unsafe conditions, follow response updates, and receive important campus safety notices from one secure dashboard.</p>
+        <div className="public-card hero-card glass-panel">
+          <div className="hero-card-top">
+            <ShieldCheck size={32} />
+            <span>Live safety workflow</span>
+          </div>
+          <h2>From report to resolution</h2>
+          <div className="hero-steps">
+            <p><span>01</span> Submit the hazard with location and severity.</p>
+            <p><span>02</span> Track review, assignment, and response updates.</p>
+            <p><span>03</span> Receive alerts when an area needs attention.</p>
+          </div>
         </div>
       </section>
 
-      <section className="public-grid">
+      <section className="public-grid" id="safety-guide">
         <article className="glass-panel public-info-card">
           <h2>
             What to report
@@ -610,7 +622,7 @@ function PublicGateway({ authLoading, authError }) {
           </h2>
           <ul>
             <li>Your report receives a tracking record.</li>
-            <li>An EHS officer or unit reviews and updates the response status.</li>
+            <li>The safety team reviews and updates the response status.</li>
             <li>You can return to your dashboard to check progress and alerts.</li>
           </ul>
         </article>
@@ -629,7 +641,7 @@ function PublicGateway({ authLoading, authError }) {
         </article>
       </section>
 
-      <section className="role-login glass-panel">
+      <section className="role-login glass-panel" id="get-started">
         <div>
           <p className="eyebrow">Get started</p>
           <h2>Access your campus safety dashboard</h2>
@@ -646,21 +658,37 @@ function PublicGateway({ authLoading, authError }) {
         </div>
       </section>
 
-      <section className="role-login dashboard-routes glass-panel">
+      <section className="role-login dashboard-routes glass-panel" id="dashboards">
         <div>
           <p className="eyebrow">Who uses COUU-EHS</p>
-          <h2>Different dashboards for different safety work</h2>
-          <p>Students and staff focus on reporting and updates. EHS teams handle review, response, alerts, and compliance follow-up.</p>
+          <h2>Three focused dashboards for campus safety</h2>
+          <p>Students and staff focus on reporting and updates. Admins handle review, response, alerts, analytics, and compliance follow-up.</p>
         </div>
         <div className="role-grid">
-          {Object.entries(roles).map(([role, config]) => (
-            <article key={role} className="role-card static">
-              <strong>{config.label}</strong>
-              <span>{config.description}</span>
-            </article>
-          ))}
+          {dashboardRoles.map((role) => {
+            const config = roles[role];
+            return (
+              <article key={role} className="role-card static">
+                <strong>{config.label}</strong>
+                <span>{config.description}</span>
+              </article>
+            );
+          })}
         </div>
       </section>
+
+      <footer className="public-footer">
+        <Brand />
+        <div>
+          <strong>Campus safety, clearer and faster.</strong>
+          <p>Use COUU-EHS to report hazards early, follow response progress, and stay informed about environmental health notices.</p>
+        </div>
+        <div className="footer-links">
+          <a href="#safety-guide">Safety guide</a>
+          <a href="#get-started">Get started</a>
+          <a href="#dashboards">Dashboards</a>
+        </div>
+      </footer>
 
       {authModal && (
         <AuthModal
@@ -854,7 +882,7 @@ function DesktopApp({ view, setView, metrics, activeIncident, session, onLogout,
             {canUseOperationalSearch(role) && (
               <label className="search-box">
                 <Search size={16} />
-                <input placeholder="Search incident, protocol, officer..." />
+                <input placeholder="Search incident, protocol, unit..." />
               </label>
             )}
             <AccessBadge role={role} />
@@ -920,12 +948,12 @@ function CommandCenter({ metrics, incidentsList }) {
         <div>
           <p className="eyebrow">Real-time safety intelligence</p>
           <h1>
-            Officer Command Center
+            Admin Command Center
             <GuideTip title="Dashboard guide">
               This workspace is for reviewing live reports, narrowing them by category or severity, and deciding which incidents need response first.
             </GuideTip>
           </h1>
-          <p>Monitor active hazards, assign response units, and keep COOU facilities compliant.</p>
+          <p>Monitor active hazards, assign response units, and keep COUU facilities compliant.</p>
         </div>
         <button className="secondary-button"><Download size={18} /> Shift Report</button>
       </section>
@@ -934,7 +962,7 @@ function CommandCenter({ metrics, incidentsList }) {
         <h2>
           <Filter size={18} /> Filters
           <GuideTip title="Using filters">
-            Filters help officers focus on a specific hazard type, priority level, or campus area before assigning response work.
+            Filters help admins focus on a specific hazard type, priority level, or campus area before assigning response work.
           </GuideTip>
         </h2>
         <FieldLabel
@@ -974,7 +1002,7 @@ function CommandCenter({ metrics, incidentsList }) {
           <h2>
             Active Incident Feed
             <GuideTip title="Incident cards">
-              Each card shows severity, location, timing, assigned unit, and progress so officers can quickly decide the next action.
+              Each card shows severity, location, timing, assigned unit, and progress so admins can quickly decide the next action.
             </GuideTip>
           </h2>
           <div className="view-toggle">
@@ -1039,7 +1067,7 @@ function CampusMap() {
       <h2>
         Campus Heat Map
         <GuideTip title="Heat map guide">
-          Pins show where active risks are concentrated so officers can spot repeated problem areas.
+          Pins show where active risks are concentrated so admins can spot repeated problem areas.
         </GuideTip>
       </h2>
       <div className="map-box">
@@ -1160,7 +1188,7 @@ function ReportHazard({ session, activityList, refreshData, onReportCreated }) {
               Fill the required fields with enough detail for EHS to find the hazard, judge the risk, and assign a response team.
             </GuideTip>
           </h1>
-          <p>Capture the details officers need to prioritize, assign, and resolve safety incidents.</p>
+          <p>Capture the details admins need to prioritize, assign, and resolve safety incidents.</p>
         </div>
       </section>
 
@@ -1285,7 +1313,7 @@ function IncidentTimeline({ incident, refreshData }) {
 
   const steps = [
     { title: 'Hazard Submitted', text: 'Initial report submitted with location and photo evidence.', done: true },
-    { title: 'Assigned to EHS Unit', text: `Science safety officer assigned for on-site review. Status: ${incident.status}`, done: true },
+    { title: 'Assigned to EHS Unit', text: `Safety response unit assigned for on-site review. Status: ${incident.status}`, done: true },
     { title: 'In Progress: On-Site Assessment', text: 'Containment team verifying spill boundary and ventilation.', done: incident.status !== 'Reported' },
     { title: 'Resolved', text: 'Safety checks complete and confirmed.', done: incident.status === 'Resolved' }
   ];
@@ -1365,7 +1393,7 @@ function IncidentTimeline({ incident, refreshData }) {
         <h2>
           Resolution Form
           <GuideTip title="Closure details">
-            Officers use this form to document the final action, add safety readings, attach proof, and confirm the location is ready for verification.
+            Admins use this form to document the final action, add safety readings, attach proof, and confirm the location is ready for verification.
           </GuideTip>
         </h2>
         <label>
@@ -1476,7 +1504,7 @@ function Analytics({ metrics }) {
         <h2>
           Audit Observations
           <GuideTip title="Audit notes">
-            These items highlight compliance issues and improvements that management should review during safety planning.
+            These items highlight compliance issues and improvements that admins should review during safety planning.
           </GuideTip>
         </h2>
         {['Laboratory storage labeling needs review', 'Emergency exit obstruction resolved', 'Waste pickup frequency improved'].map((item, index) => (
@@ -1495,7 +1523,7 @@ function MobileApp({ view, setView, activeIncident, session, onLogout, incidents
   const role = session.role;
   const [profileOpen, setProfileOpen] = useState(false);
   const mobileViews = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home, permission: 'report:own' },
+    { id: 'dashboard', label: 'Dashboard', icon: Home, permission: 'report:own', fallbackPermission: 'incident:all' },
     { id: 'myReports', label: 'My Reports', icon: FileText, permission: 'report:own' },
     { id: 'report', label: 'Report', icon: Plus, permission: 'report:create' },
     { id: 'tracker', label: 'Tracker', icon: ClipboardCheck, permission: 'report:own', fallbackPermission: 'incident:resolve' },

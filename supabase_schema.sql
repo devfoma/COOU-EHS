@@ -4,7 +4,7 @@
 -- 1. Profiles Table (Linked to Supabase Auth)
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'staff', 'officer', 'supervisor', 'admin', 'management')),
+    role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'staff', 'admin')),
     name TEXT NOT NULL,
     department TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
@@ -53,7 +53,7 @@ CREATE POLICY "Profiles are visible to owners and EHS leadership"
     TO authenticated
     USING (
       auth.uid() = id
-      OR public.current_profile_role() IN ('officer', 'supervisor', 'admin', 'management')
+      OR public.current_profile_role() = 'admin'
     );
 
 CREATE POLICY "Users can create their own student or staff profile"
@@ -107,7 +107,7 @@ CREATE POLICY "Users read own reports and operators read all"
     TO authenticated
     USING (
       reporter_id = auth.uid()
-      OR public.current_profile_role() IN ('officer', 'supervisor', 'admin', 'management')
+      OR public.current_profile_role() = 'admin'
     );
 
 CREATE POLICY "Authenticated users create their own reports"
@@ -118,8 +118,8 @@ CREATE POLICY "Authenticated users create their own reports"
 CREATE POLICY "Operators update hazard reports"
     ON public.hazard_reports FOR UPDATE
     TO authenticated
-    USING (public.current_profile_role() IN ('officer', 'supervisor', 'admin'))
-    WITH CHECK (public.current_profile_role() IN ('officer', 'supervisor', 'admin'));
+    USING (public.current_profile_role() = 'admin')
+    WITH CHECK (public.current_profile_role() = 'admin');
 
 -- 3. Alerts Table
 CREATE TABLE IF NOT EXISTS public.alerts (
@@ -138,17 +138,18 @@ DROP POLICY IF EXISTS "Allow public read access to alerts" ON public.alerts;
 DROP POLICY IF EXISTS "Allow supervisors/admins to insert alerts" ON public.alerts;
 DROP POLICY IF EXISTS "Authenticated users can read alerts" ON public.alerts;
 DROP POLICY IF EXISTS "Supervisors and admins manage alerts" ON public.alerts;
+DROP POLICY IF EXISTS "Admins manage alerts" ON public.alerts;
 
 CREATE POLICY "Authenticated users can read alerts"
     ON public.alerts FOR SELECT
     TO authenticated
     USING (true);
 
-CREATE POLICY "Supervisors and admins manage alerts"
+CREATE POLICY "Admins manage alerts"
     ON public.alerts FOR ALL
     TO authenticated
-    USING (public.current_profile_role() IN ('supervisor', 'admin'))
-    WITH CHECK (public.current_profile_role() IN ('supervisor', 'admin'));
+    USING (public.current_profile_role() = 'admin')
+    WITH CHECK (public.current_profile_role() = 'admin');
 
 -- 4. Activity Logs Table
 CREATE TABLE IF NOT EXISTS public.activity_logs (
@@ -200,7 +201,7 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 -- Seed Data (Incidents)
 INSERT INTO public.hazard_reports (id, title, category, location, severity, status, reporter_name, assigned_to, description, progress)
 VALUES 
-('HAZ-2904', 'Chemical Leak - Block C-14', 'Laboratory', 'Science Complex, Lab 4B', 'critical', 'In Progress', 'Dr. Ifeoma N.', 'Officer Marcus R.', 'Chemical odor detected near reagent storage. Students evacuated from adjacent rooms.', 68)
+('HAZ-2904', 'Chemical Leak - Block C-14', 'Laboratory', 'Science Complex, Lab 4B', 'critical', 'In Progress', 'Dr. Ifeoma N.', 'Safety Response Unit', 'Chemical odor detected near reagent storage. Students evacuated from adjacent rooms.', 68)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.hazard_reports (id, title, category, location, severity, status, reporter_name, assigned_to, description, progress)
@@ -221,7 +222,7 @@ ON CONFLICT (id) DO NOTHING;
 -- Seed Data (Alerts)
 INSERT INTO public.alerts (title, location, severity, time_label, body)
 VALUES 
-('Chemical Spill', 'Science Complex', 'critical', 'Active now', 'Avoid Block C corridor until EHS officers complete containment.'),
+('Chemical Spill', 'Science Complex', 'critical', 'Active now', 'Avoid Block C corridor until the safety team completes containment.'),
 ('Power Outage', 'Engineering Annex', 'high', 'Ends 4:30 PM', 'Use marked stair routes. Maintenance team is restoring supply.'),
 ('Clinic Sanitation Drill', 'Medical Centre', 'low', 'Oct 24', 'Routine safety inspection and hand hygiene audit in progress.')
 ON CONFLICT DO NOTHING;
@@ -229,7 +230,7 @@ ON CONFLICT DO NOTHING;
 -- Seed Data (Activity Logs)
 INSERT INTO public.activity_logs (description)
 VALUES 
-('Officer Marcus R. updated HAZ-2904 to In Progress.'),
+('Safety Response Unit updated HAZ-2904 to In Progress.'),
 ('New evidence uploaded for HAZ-1841.'),
 ('Sanitation Unit requested verification for HAZ-1377.'),
 ('Campus alert published for Science Complex.');
