@@ -590,18 +590,20 @@ function PublicGateway({ authLoading, authError }) {
         >
           {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <nav className="public-nav" aria-label="Landing page navigation">
-          <a href="#safety-guide" onClick={() => setMobileMenuOpen(false)}>Safety guide</a>
-          <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How it works</a>
-          <a href="#get-started" onClick={() => setMobileMenuOpen(false)}>Get started</a>
-        </nav>
-        <div className="public-header-actions">
-          <button className="ghost-button" type="button" onClick={() => openAuthModal('signIn')}>
-            <LogIn size={17} /> Sign In
-          </button>
-          <button className="primary-button" type="button" onClick={() => openAuthModal('signUp')}>
-            <UserPlus size={17} /> Create Account
-          </button>
+        <div className="public-menu-panel">
+          <nav className="public-nav" aria-label="Landing page navigation">
+            <a href="#safety-guide" onClick={() => setMobileMenuOpen(false)}>Safety guide</a>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How it works</a>
+            <a href="#get-started" onClick={() => setMobileMenuOpen(false)}>Get started</a>
+          </nav>
+          <div className="public-header-actions">
+            <button className="ghost-button" type="button" onClick={() => openAuthModal('signIn')}>
+              <LogIn size={17} /> Sign In
+            </button>
+            <button className="primary-button" type="button" onClick={() => openAuthModal('signUp')}>
+              <UserPlus size={17} /> Create Account
+            </button>
+          </div>
         </div>
       </motion.header>
 

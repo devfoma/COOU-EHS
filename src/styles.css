@@ -88,6 +88,13 @@ button:disabled {
   gap: 8px;
 }
 
+.public-menu-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
 .public-nav a,
 .footer-links a {
   padding: 9px 11px;
@@ -1832,10 +1839,12 @@ button:disabled {
 
   .public-header {
     top: 8px;
+    z-index: 220;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     justify-items: stretch;
     margin-bottom: 30px;
+    overflow: visible;
   }
 
   .public-header .brand {
@@ -1846,13 +1855,30 @@ button:disabled {
     display: grid;
   }
 
-  .public-nav {
+  .public-menu-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    z-index: 221;
     display: none;
-    grid-column: 1 / -1;
+    padding: 12px;
+    background: rgba(5, 20, 36, 0.96);
+    border: 1px solid rgba(212, 228, 250, 0.18);
+    border-radius: 8px;
+    box-shadow: 0 18px 48px rgba(1, 15, 31, 0.5);
+    backdrop-filter: blur(18px);
+  }
+
+  .public-header.menu-open .public-menu-panel {
+    display: grid;
+    gap: 10px;
+  }
+
+  .public-nav {
+    display: grid;
     grid-template-columns: 1fr;
     gap: 6px;
-    padding-top: 12px;
-    border-top: 1px solid var(--outline);
   }
 
   .public-nav a {
@@ -1862,15 +1888,9 @@ button:disabled {
   }
 
   .public-header-actions {
-    display: none;
-    grid-column: 1 / -1;
+    display: grid;
     grid-template-columns: 1fr;
     gap: 8px;
-  }
-
-  .public-header.menu-open .public-nav,
-  .public-header.menu-open .public-header-actions {
-    display: grid;
   }
 
   .public-header-actions .primary-button,
