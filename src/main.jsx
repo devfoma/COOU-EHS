@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { createRoot } from 'react-dom/client';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Activity,
   AlertTriangle,
@@ -41,7 +42,7 @@ import {
 import './styles.css';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 
-const BRAND_NAME = 'COUU-EHS';
+const BRAND_NAME = 'COOU-EHS';
 const LOGO_URL = new URL('../ASSETS/COOU-EHS LOGO MARK.png', import.meta.url).href;
 
 const roles = {
@@ -81,8 +82,42 @@ const roleAliases = {
   management: 'admin'
 };
 
-const dashboardRoles = ['student', 'staff', 'admin'];
 const selfServiceRoles = ['student', 'staff'];
+
+function createLandingMotion(prefersReducedMotion) {
+  const distance = prefersReducedMotion ? 0 : 28;
+  const duration = prefersReducedMotion ? 0.01 : 0.6;
+  const staggerChildren = prefersReducedMotion ? 0 : 0.1;
+
+  return {
+    header: {
+      hidden: { opacity: 0, y: prefersReducedMotion ? 0 : -12 },
+      show: { opacity: 1, y: 0, transition: { duration, ease: 'easeOut' } }
+    },
+    section: {
+      hidden: { opacity: 0, y: distance },
+      show: { opacity: 1, y: 0, transition: { duration, ease: 'easeOut' } }
+    },
+    group: {
+      hidden: { opacity: 1 },
+      show: {
+        opacity: 1,
+        transition: {
+          staggerChildren,
+          delayChildren: prefersReducedMotion ? 0 : 0.08
+        }
+      }
+    },
+    item: {
+      hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 18 },
+      show: { opacity: 1, y: 0, transition: { duration: prefersReducedMotion ? 0.01 : 0.5, ease: 'easeOut' } }
+    },
+    card: {
+      hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 22, scale: prefersReducedMotion ? 1 : 0.98 },
+      show: { opacity: 1, y: 0, scale: 1, transition: { duration, ease: 'easeOut' } }
+    }
+  };
+}
 
 function hasAccess(role, permission) {
   return roles[role]?.permissions.includes(permission) || false;
@@ -473,6 +508,9 @@ function PublicGateway({ authLoading, authError }) {
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState('');
   const [formError, setFormError] = useState('');
+  const prefersReducedMotion = useReducedMotion();
+  const landingMotion = useMemo(() => createLandingMotion(prefersReducedMotion), [prefersReducedMotion]);
+  const landingViewport = useMemo(() => ({ once: true, amount: 0.18 }), []);
 
   const isSignUp = authModal === 'signUp';
 
@@ -536,7 +574,12 @@ function PublicGateway({ authLoading, authError }) {
 
   return (
     <main className="public-shell">
-      <header className={`public-header ${mobileMenuOpen ? 'menu-open' : ''}`}>
+      <motion.header
+        className={`public-header ${mobileMenuOpen ? 'menu-open' : ''}`}
+        variants={landingMotion.header}
+        initial="hidden"
+        animate="show"
+      >
         <Brand />
         <button
           className="public-menu-button"
@@ -549,8 +592,8 @@ function PublicGateway({ authLoading, authError }) {
         </button>
         <nav className="public-nav" aria-label="Landing page navigation">
           <a href="#safety-guide" onClick={() => setMobileMenuOpen(false)}>Safety guide</a>
+          <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How it works</a>
           <a href="#get-started" onClick={() => setMobileMenuOpen(false)}>Get started</a>
-          <a href="#dashboards" onClick={() => setMobileMenuOpen(false)}>Dashboards</a>
         </nav>
         <div className="public-header-actions">
           <button className="ghost-button" type="button" onClick={() => openAuthModal('signIn')}>
@@ -560,31 +603,37 @@ function PublicGateway({ authLoading, authError }) {
             <UserPlus size={17} /> Create Account
           </button>
         </div>
-      </header>
+      </motion.header>
 
-      <section className="public-hero">
-        <div className="public-hero-copy">
-          <p className="eyebrow">COUU Environmental Health and Safety</p>
-          <h1>Report campus hazards before they become emergencies.</h1>
-          <p>
-            COUU-EHS gives students and staff a simple way to report unsafe conditions, track
-            progress, and receive safety notices while admins coordinate response from one place.
-          </p>
-          <div className="landing-actions">
+      <motion.section
+        className="public-hero"
+        variants={landingMotion.section}
+        initial="hidden"
+        whileInView="show"
+        viewport={landingViewport}
+      >
+        <motion.div className="public-hero-copy" variants={landingMotion.group}>
+          <motion.p className="eyebrow" variants={landingMotion.item}>COOU Environmental Health and Safety</motion.p>
+          <motion.h1 variants={landingMotion.item}>Report campus hazards before they become emergencies.</motion.h1>
+          <motion.p variants={landingMotion.item}>
+            COOU-EHS gives the campus community a simple way to report unsafe conditions, track
+            progress, and receive safety notices while the safety team coordinates response.
+          </motion.p>
+          <motion.div className="landing-actions" variants={landingMotion.item}>
             <button className="primary-button" type="button" onClick={() => openAuthModal('signIn')}>
               <LogIn size={18} /> Sign In
             </button>
             <button className="secondary-button" type="button" onClick={() => openAuthModal('signUp')}>
               <UserPlus size={18} /> Create Account
             </button>
-          </div>
-          <div className="hero-stats" aria-label="COUU-EHS service highlights">
-            <span><strong>3</strong> focused dashboards</span>
-            <span><strong>24/7</strong> hazard logging</span>
-            <span><strong>1</strong> campus safety record</span>
-          </div>
-        </div>
-        <div className="public-card hero-card glass-panel">
+          </motion.div>
+          <motion.div className="hero-stats" aria-label="COOU-EHS service highlights" variants={landingMotion.group}>
+            <motion.span variants={landingMotion.item}><strong>Fast</strong> hazard reporting</motion.span>
+            <motion.span variants={landingMotion.item}><strong>Clear</strong> follow-up updates</motion.span>
+            <motion.span variants={landingMotion.item}><strong>Safer</strong> campus spaces</motion.span>
+          </motion.div>
+        </motion.div>
+        <motion.div className="public-card hero-card glass-panel" variants={landingMotion.card}>
           <div className="hero-card-top">
             <ShieldCheck size={32} />
             <span>Live safety workflow</span>
@@ -595,11 +644,18 @@ function PublicGateway({ authLoading, authError }) {
             <p><span>02</span> Track review, assignment, and response updates.</p>
             <p><span>03</span> Receive alerts when an area needs attention.</p>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="public-grid" id="safety-guide">
-        <article className="glass-panel public-info-card">
+      <motion.section
+        className="public-grid"
+        id="safety-guide"
+        variants={landingMotion.group}
+        initial="hidden"
+        whileInView="show"
+        viewport={landingViewport}
+      >
+        <motion.article className="glass-panel public-info-card" variants={landingMotion.card}>
           <h2>
             What to report
             <GuideTip title="Report criteria">
@@ -611,8 +667,8 @@ function PublicGateway({ authLoading, authError }) {
             <li>Faulty lighting, damaged railings, unsafe buildings, or exposed wiring.</li>
             <li>Laboratory spills, fire risks, blocked exits, and urgent safety concerns.</li>
           </ul>
-        </article>
-        <article className="glass-panel public-info-card restricted">
+        </motion.article>
+        <motion.article className="glass-panel public-info-card restricted" variants={landingMotion.card}>
           <h2>
             Before you submit
             <GuideTip title="Useful details">
@@ -624,8 +680,8 @@ function PublicGateway({ authLoading, authError }) {
             <li>Add a clear photo when it is safe to do so.</li>
             <li>Choose the closest severity level so the response team can prioritize.</li>
           </ul>
-        </article>
-        <article className="glass-panel public-info-card">
+        </motion.article>
+        <motion.article className="glass-panel public-info-card" variants={landingMotion.card}>
           <h2>
             After reporting
             <GuideTip title="Tracking">
@@ -637,12 +693,12 @@ function PublicGateway({ authLoading, authError }) {
             <li>The safety team reviews and updates the response status.</li>
             <li>You can return to your dashboard to check progress and alerts.</li>
           </ul>
-        </article>
-        <article className="glass-panel public-info-card">
+        </motion.article>
+        <motion.article className="glass-panel public-info-card" variants={landingMotion.card}>
           <h2>
             If it is urgent
             <GuideTip title="Emergency guidance">
-              For immediate danger, move away first and use campus emergency channels. COUU-EHS records the issue, but it does not replace emergency response.
+              For immediate danger, move away first and use campus emergency channels. COOU-EHS records the issue, but it does not replace emergency response.
             </GuideTip>
           </h2>
           <ul>
@@ -650,16 +706,58 @@ function PublicGateway({ authLoading, authError }) {
             <li>Warn nearby students or staff where safe.</li>
             <li>Use campus emergency channels for life-threatening situations.</li>
           </ul>
-        </article>
-      </section>
+        </motion.article>
+      </motion.section>
 
-      <section className="role-login glass-panel" id="get-started">
-        <div>
+      <motion.section
+        className="public-details"
+        id="how-it-works"
+        variants={landingMotion.section}
+        initial="hidden"
+        whileInView="show"
+        viewport={landingViewport}
+      >
+        <motion.div className="section-intro" variants={landingMotion.group}>
+          <p className="eyebrow">What first-time users should know</p>
+          <motion.h2 variants={landingMotion.item}>COOU-EHS is for everyday safety concerns, not only emergencies.</motion.h2>
+          <p>
+            Use it when you notice unsafe spaces, sanitation concerns, facility damage, lab risks,
+            blocked access routes, fire risks, or anything that may affect health and safety on campus.
+          </p>
+        </motion.div>
+        <motion.div className="detail-card-grid" variants={landingMotion.group}>
+          <motion.article className="glass-panel detail-card" variants={landingMotion.card}>
+            <ClipboardCheck size={24} />
+            <h3>Make the report easy to act on</h3>
+            <p>Include the location, what you observed, how serious it looks, and whether anyone is already affected.</p>
+          </motion.article>
+          <motion.article className="glass-panel detail-card" variants={landingMotion.card}>
+            <Bell size={24} />
+            <h3>Check back for updates</h3>
+            <p>After submitting, return to your account to see status changes and important safety notices.</p>
+          </motion.article>
+          <motion.article className="glass-panel detail-card" variants={landingMotion.card}>
+            <Siren size={24} />
+            <h3>Use emergency channels first</h3>
+            <p>If someone is in immediate danger, move away, alert nearby people, and contact campus emergency response first.</p>
+          </motion.article>
+        </motion.div>
+      </motion.section>
+
+      <motion.section
+        className="role-login glass-panel"
+        id="get-started"
+        variants={landingMotion.section}
+        initial="hidden"
+        whileInView="show"
+        viewport={landingViewport}
+      >
+        <motion.div variants={landingMotion.item}>
           <p className="eyebrow">Get started</p>
-          <h2>Access your campus safety dashboard</h2>
-          <p>Use your account to submit reports, monitor updates, and receive safety alerts relevant to your role.</p>
-        </div>
-        <div className="auth-cta-group">
+          <h2>Access your campus safety account</h2>
+          <p>Sign in or create an account to submit reports, monitor updates, and receive safety alerts relevant to you.</p>
+        </motion.div>
+        <motion.div className="auth-cta-group" variants={landingMotion.item}>
           <button className="primary-button" type="button" onClick={() => openAuthModal('signIn')}>
             <LogIn size={18} /> Sign In
           </button>
@@ -667,40 +765,27 @@ function PublicGateway({ authLoading, authError }) {
             <UserPlus size={18} /> Create Account
           </button>
           {authError && <p className="auth-error">{authError}</p>}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="role-login dashboard-routes glass-panel" id="dashboards">
-        <div>
-          <p className="eyebrow">Who uses COUU-EHS</p>
-          <h2>Three focused dashboards for campus safety</h2>
-          <p>Students and staff focus on reporting and updates. Admins handle review, response, alerts, analytics, and compliance follow-up.</p>
-        </div>
-        <div className="role-grid">
-          {dashboardRoles.map((role) => {
-            const config = roles[role];
-            return (
-              <article key={role} className="role-card static">
-                <strong>{config.label}</strong>
-                <span>{config.description}</span>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <footer className="public-footer">
+      <motion.footer
+        className="public-footer"
+        variants={landingMotion.section}
+        initial="hidden"
+        whileInView="show"
+        viewport={landingViewport}
+      >
         <Brand />
         <div>
           <strong>Campus safety, clearer and faster.</strong>
-          <p>Use COUU-EHS to report hazards early, follow response progress, and stay informed about environmental health notices.</p>
+          <p>Use COOU-EHS to report hazards early, follow response progress, and stay informed about environmental health notices.</p>
         </div>
         <div className="footer-links">
           <a href="#safety-guide">Safety guide</a>
+          <a href="#how-it-works">How it works</a>
           <a href="#get-started">Get started</a>
-          <a href="#dashboards">Dashboards</a>
         </div>
-      </footer>
+      </motion.footer>
 
       {authModal && (
         <AuthModal
@@ -758,7 +843,7 @@ function AuthModal({
         <header className="modal-header">
           <div>
             <p className="eyebrow">Secure access</p>
-            <h2 id="auth-modal-title">{isSignUp ? 'Create your COUU-EHS account' : 'Sign in to COUU-EHS'}</h2>
+            <h2 id="auth-modal-title">{isSignUp ? 'Create your COOU-EHS account' : 'Sign in to COOU-EHS'}</h2>
           </div>
           <button className="icon-button" type="button" aria-label="Close authentication modal" onClick={closeAuthModal}>
             <X size={18} />
@@ -965,7 +1050,7 @@ function CommandCenter({ metrics, incidentsList }) {
               This workspace is for reviewing live reports, narrowing them by category or severity, and deciding which incidents need response first.
             </GuideTip>
           </h1>
-          <p>Monitor active hazards, assign response units, and keep COUU facilities compliant.</p>
+          <p>Monitor active hazards, assign response units, and keep COOU facilities compliant.</p>
         </div>
         <button className="secondary-button"><Download size={18} /> Shift Report</button>
       </section>
@@ -1935,7 +2020,7 @@ function MobileAlerts({ role, alertsList }) {
           <h2>
             Immediate Assistance?
             <GuideTip title="Emergency help">
-              Use emergency response for immediate danger. Submit a COUU-EHS report afterward when it is safe.
+              Use emergency response for immediate danger. Submit a COOU-EHS report afterward when it is safe.
             </GuideTip>
           </h2>
           <p>Call campus emergency response.</p>
