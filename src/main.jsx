@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import {
   Activity,
@@ -1602,7 +1603,7 @@ function MyReports({ reports, role, compact = false }) {
   const resolvedReports = (reports || []).filter((report) => report.status === 'Resolved' || report.status === 'Closed');
 
   return (
-    <div className={compact ? 'mobile-screen' : 'screen my-reports-screen'}>
+    <div className={compact ? 'mobile-screen my-reports-compact' : 'screen my-reports-screen'}>
       <section className={compact ? 'mobile-hero' : 'page-heading full'}>
         <div>
           <p className="eyebrow">{ownsOnly ? 'Submitted by you' : 'Report records'}</p>
@@ -2001,7 +2002,7 @@ function GuideTip({ title, children }) {
       >
         <Info size={14} />
       </button>
-      {open && (
+      {open && createPortal(
         <div className="modal-backdrop guide-modal-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
           <section
             className="modal-card guide-modal"
@@ -2021,7 +2022,8 @@ function GuideTip({ title, children }) {
             </header>
             <p>{children}</p>
           </section>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -977,6 +977,17 @@ button:disabled {
   gap: 18px;
 }
 
+.my-reports-compact {
+  align-content: start;
+}
+
+.my-reports-compact .mobile-hero h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .my-report-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -1096,6 +1107,7 @@ button:disabled {
 }
 
 .my-report-row .incident-meta svg {
+  flex: 0 0 auto;
   color: var(--green);
 }
 
@@ -1667,6 +1679,10 @@ button:disabled {
     padding: 18px 16px;
   }
 
+  .my-reports-compact {
+    gap: 18px;
+  }
+
   .mobile-hero {
     padding: 12px 0 4px;
   }
@@ -1683,16 +1699,35 @@ button:disabled {
     gap: 12px;
   }
 
-  .my-report-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .my-report-summary,
+  .my-reports-compact .my-report-summary {
+    grid-template-columns: 1fr;
   }
 
   .my-report-summary .metric-mini {
     padding: 14px 10px;
   }
 
+  .my-reports-compact .metric-mini {
+    display: grid;
+    grid-template-columns: minmax(42px, auto) minmax(0, 1fr);
+    align-items: center;
+    gap: 4px 12px;
+    padding: 14px;
+  }
+
   .my-report-summary .metric-mini strong {
     font-size: 28px;
+  }
+
+  .my-reports-compact .metric-mini strong {
+    grid-row: 1 / 3;
+    align-self: center;
+    line-height: 1;
+  }
+
+  .my-reports-compact .metric-mini span {
+    margin-top: 0;
   }
 
   .metric-mini {
@@ -1709,6 +1744,33 @@ button:disabled {
   .metric-mini span {
     color: var(--text-muted);
     font-size: 13px;
+  }
+
+  .my-reports-compact .my-report-list {
+    gap: 14px;
+  }
+
+  .my-reports-compact .my-report-row {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .my-reports-compact .my-report-row h2,
+  .my-reports-compact .my-report-row p {
+    margin: 0;
+  }
+
+  .my-reports-compact .my-report-row .incident-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .my-reports-compact .my-report-row .incident-meta span {
+    display: inline-flex;
+    width: 100%;
+    border-radius: 8px;
   }
 
 .mobile-report-card,
