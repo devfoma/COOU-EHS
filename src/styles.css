@@ -711,20 +711,12 @@ button:disabled {
   color: var(--green);
 }
 
-.guide-tip {
-  position: relative;
-  z-index: 20;
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-  line-height: 1;
-  vertical-align: middle;
-}
-
 .guide-button {
   display: inline-grid;
   width: 26px;
   height: 26px;
+  flex: 0 0 auto;
+  margin-left: 8px;
   padding: 0;
   place-items: center;
   color: var(--green);
@@ -733,6 +725,7 @@ button:disabled {
   border-radius: 999px;
   box-shadow: none;
   cursor: help;
+  vertical-align: middle;
 }
 
 .guide-button:hover,
@@ -742,46 +735,36 @@ button:disabled {
   outline: 0;
 }
 
-.guide-popover {
-  position: absolute;
-  top: 34px;
-  left: 0;
-  z-index: 50;
-  display: none;
-  width: min(286px, calc(100vw - 32px));
-  padding: 12px 13px;
+.guide-modal-backdrop {
+  z-index: 130;
+}
+
+.guide-modal {
+  width: min(100%, 420px);
+}
+
+.guide-modal p {
+  margin: 0;
   color: var(--text-muted);
-  background: rgba(3, 17, 31, 0.98);
-  border: 1px solid rgba(212, 228, 250, 0.22);
-  border-radius: 8px;
-  box-shadow: 0 16px 42px rgba(1, 15, 31, 0.5);
-  font-family: Inter, system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.45;
-  text-align: left;
-  text-transform: none;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
-.guide-popover strong {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--text);
-  font-family: Outfit, Inter, sans-serif;
-  font-size: 14px;
-  letter-spacing: 0;
-  line-height: 1.2;
-  text-transform: none;
-}
-
-.guide-popover span {
-  display: block;
-}
-
-.guide-tip:hover .guide-popover,
-.guide-tip:focus-within .guide-popover {
-  display: block;
+.page-heading h1,
+.mobile-hero h1,
+.section-title h2,
+.public-info-card h2,
+.filter-panel h2,
+.campus-map h2,
+.protocols h2,
+.timeline-panel h2,
+.resolution-form h2,
+.activity-panel h2,
+.chart-panel h2,
+.audit-table h2,
+.mini-timeline h2,
+.assist-card h2 {
+  overflow-wrap: anywhere;
 }
 
 .page-heading p {
@@ -996,11 +979,12 @@ button:disabled {
 
 .my-report-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
 }
 
 .metric-mini {
+  min-width: 0;
   padding: 18px;
   background: rgba(18, 33, 49, 0.9);
   border-color: rgba(212, 228, 250, 0.18);
@@ -1015,11 +999,20 @@ button:disabled {
 }
 
 .metric-mini span {
-  display: block;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-top: 8px;
   color: var(--text);
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.metric-mini .guide-button {
+  margin-left: 0;
 }
 
 .my-report-list {
@@ -1029,7 +1022,7 @@ button:disabled {
 
 .my-report-row {
   position: relative;
-  overflow: hidden;
+  min-width: 0;
   padding: 20px;
   background: rgba(28, 43, 60, 0.94);
   border-color: rgba(212, 228, 250, 0.2);
@@ -1054,6 +1047,7 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -1063,15 +1057,18 @@ button:disabled {
   font-family: Outfit, Inter, sans-serif;
   font-size: 20px;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .my-report-row p {
   margin: 0 0 14px;
   color: #e2edfb;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .report-code {
+  max-width: 100%;
   color: var(--text);
   padding: 5px 8px;
   background: rgba(1, 15, 31, 0.62);
@@ -1089,11 +1086,13 @@ button:disabled {
 }
 
 .my-report-row .incident-meta span {
+  min-width: 0;
   padding: 7px 9px;
   color: var(--text);
   background: rgba(1, 15, 31, 0.45);
   border: 1px solid rgba(212, 228, 250, 0.12);
   border-radius: 999px;
+  overflow-wrap: anywhere;
 }
 
 .my-report-row .incident-meta svg {
@@ -1685,7 +1684,7 @@ button:disabled {
   }
 
   .my-report-summary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .my-report-summary .metric-mini {
@@ -1928,21 +1927,18 @@ button:disabled {
     height: 24px;
   }
 
-  .guide-popover {
-    top: 31px;
-    right: 0;
-    left: auto;
-    width: min(260px, calc(100vw - 32px));
-  }
-
-  .page-heading h1 .guide-tip,
-  .mobile-hero h1 .guide-tip,
-  .section-title h2 .guide-tip {
+  .page-heading h1 .guide-button,
+  .mobile-hero h1 .guide-button,
+  .section-title h2 .guide-button {
     margin-left: 6px;
   }
 
   .mobile-metrics,
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .my-report-summary {
+    grid-template-columns: 1fr;
   }
 }
