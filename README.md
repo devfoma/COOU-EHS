@@ -1,6 +1,6 @@
-# COUU-EHS (Environmental Health and Safety System)
+# COOU-EHS (Environmental Health and Safety System)
 
-COUU-EHS is a responsive Environmental Health and Safety Application System designed for campus hazard reporting, response tracking, safety alert publication, and compliance reporting.
+COOU-EHS is a responsive Environmental Health and Safety Application System designed for campus hazard reporting, response tracking, safety alert publication, and compliance reporting.
 
 ## 🚀 Features
 
@@ -36,8 +36,8 @@ npm install
 ### Step 2: Supabase Environment Variables
 Create a `.env` file in the root directory and add your Supabase project parameters:
 ```env
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### Step 3: Run the Application Locally
@@ -67,5 +67,5 @@ npm run build
 
 All tables inside the [supabase_schema.sql](file:///c:/Users/U%20S%20E%20R/Drips/Devfoma/Final/Christian/Environmental_health/supabase_schema.sql) schema enforce Row Level Security:
 - **Profiles:** Users can only modify their own profiles.
-- **Incident Reporting:** Students and staff can file concerns and view only the reports they submitted through a dedicated **My Reports** tab. Admin users can view broader operational records, edit assignments, and update resolution parameters.
+- **Incident Reporting:** Students can file concerns and view only the reports they submitted through a dedicated **My Reports** tab. Staff can file their own reports and review/search campus submissions for awareness and follow-up. Admin users can view broader operational records, edit assignments, and update resolution parameters.
 - **Alerts:** Only admin users can insert or manage safety notifications.

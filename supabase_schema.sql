@@ -1,4 +1,4 @@
--- COUU-EHS Supabase Database Schema
+-- COOU-EHS Supabase Database Schema
 -- Run this in the SQL Editor of your Supabase project dashboard.
 
 -- 1. Profiles Table (Linked to Supabase Auth)
@@ -107,7 +107,7 @@ CREATE POLICY "Users read own reports and operators read all"
     TO authenticated
     USING (
       reporter_id = auth.uid()
-      OR public.current_profile_role() = 'admin'
+      OR public.current_profile_role() IN ('staff', 'admin')
     );
 
 CREATE POLICY "Authenticated users create their own reports"
