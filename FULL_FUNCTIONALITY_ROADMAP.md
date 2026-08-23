@@ -1,6 +1,6 @@
 # Full Functionality Roadmap
 
-This document lists the remaining work required to turn the current COUU-EHS frontend prototype into a fully functional production application.
+This document lists the remaining work required to turn the current COOU-EHS frontend prototype into a fully functional production application.
 
 ## 1. Backend Application
 

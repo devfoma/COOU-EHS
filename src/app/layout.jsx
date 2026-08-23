@@ -3,15 +3,12 @@ import { CampusSafetyProvider } from '../lib/CampusSafetyProvider';
 
 export const metadata = {
   title: 'COOU-EHS | Environmental Health & Safety',
-  description: 'Campus hazard reporting, response tracking, and safety notices for COOU Uli Campus.',
-  icons: {
-    icon: '/favicon.ico',
-  }
+  description: 'Campus hazard reporting, response tracking, and safety notices for COOU Uli Campus.'
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
