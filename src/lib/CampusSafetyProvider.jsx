@@ -161,6 +161,9 @@ export function CampusSafetyProvider({ children }) {
     } catch (err) {
       console.error('Sign out error:', err);
     } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('coou_ehs_offline_session');
+      }
       setAuthSession(null);
       setProfile(null);
       setIncidentsList(fallbackIncidents);
@@ -170,8 +173,29 @@ export function CampusSafetyProvider({ children }) {
     }
   };
 
+  const loginOffline = (mockSession, mockProfile) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('coou_ehs_offline_session', JSON.stringify({ session: mockSession, profile: mockProfile }));
+    }
+    setAuthSession(mockSession);
+    setProfile(mockProfile);
+    router.replace(`/dashboard/${mockProfile.role}`);
+  };
+
   useEffect(() => {
     if (!isSupabaseConfigured) {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('coou_ehs_offline_session');
+        if (saved) {
+          try {
+            const { session: s, profile: p } = JSON.parse(saved);
+            setAuthSession(s);
+            setProfile(p);
+          } catch (e) {
+            localStorage.removeItem('coou_ehs_offline_session');
+          }
+        }
+      }
       setAuthLoading(false);
       return;
     }
@@ -230,7 +254,8 @@ export function CampusSafetyProvider({ children }) {
     loading,
     refreshData,
     handleReportCreated,
-    handleLogout
+    handleLogout,
+    loginOffline
   };
 
   return (

@@ -7,6 +7,7 @@ import { createLandingMotion } from '../../lib/landingMotion';
 import Brand from '../common/Brand';
 import GuideTip from '../common/GuideTip';
 import FieldLabel from '../common/FieldLabel';
+import { useCampusSafety } from '../../lib/CampusSafetyProvider';
 
 export function AuthModal({
   mode,
@@ -116,6 +117,7 @@ export function AuthModal({
 }
 
 export default function PublicGateway({ authLoading, authError }) {
+  const { loginOffline } = useCampusSafety();
   const [authModal, setAuthModal] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -151,7 +153,34 @@ export default function PublicGateway({ authLoading, authError }) {
     setFormMessage('');
 
     if (!isSupabaseConfigured) {
-      setFormError('Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to continue.');
+      if (!email || !password || (isSignUp && !name)) {
+        setFormError('Please complete the required fields.');
+        return;
+      }
+      setSubmitting(true);
+      setTimeout(() => {
+        const mockUser = {
+          id: 'offline-user-' + Math.random().toString(36).substring(2),
+          email: email,
+          user_metadata: {
+            name: name || email.split('@')[0],
+            department: department || 'Offline Unit',
+            role: role || 'student'
+          }
+        };
+        const mockProfile = {
+          id: mockUser.id,
+          role: role || 'student',
+          name: name || email.split('@')[0],
+          department: department || 'Offline Unit'
+        };
+        const mockSession = {
+          user: mockUser,
+          access_token: 'mock-offline-token'
+        };
+        loginOffline(mockSession, mockProfile);
+        setSubmitting(false);
+      }, 800);
       return;
     }
 
